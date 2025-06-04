@@ -65,10 +65,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     try {
       const response = await api.post('/auth/login', { email, password })
-      const { access_token } = response.data
+      const { access_token, refresh_token, expires_in } = response.data
       
-      // Store token in cookie
-      Cookies.set('access_token', access_token, { expires: 7 }) // 7 days
+      // Store tokens in cookies
+      Cookies.set('access_token', access_token, { expires: expires_in ? expires_in / 86400 : 7 }) // expires_in is in seconds, convert to days
+      if (refresh_token) {
+        Cookies.set('refresh_token', refresh_token, { expires: 30 }) // 30 days default
+      }
+      if (expires_in) {
+        Cookies.set('expires_in', String(expires_in), { expires: expires_in / 86400 })
+      }
       
       // Set token in API headers
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
@@ -92,6 +98,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     Cookies.remove('access_token')
+    Cookies.remove('refresh_token')
+    Cookies.remove('expires_in')
     delete api.defaults.headers.common['Authorization']
     setUser(null)
   }
