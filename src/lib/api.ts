@@ -1,8 +1,11 @@
 import axios from 'axios'
 
+// Detect if running in Electron
+const isElectron = typeof window !== 'undefined' && window.electronAPI?.isElectron
+
 // Create axios instance with base configuration
 export const api = axios.create({
-  baseURL: '/api', // This will be proxied to http://localhost:8000/api
+  baseURL: isElectron ? 'http://localhost:8000/api' : '/api', // Direct API URL for Electron
   headers: {
     'Content-Type': 'application/json',
   },
@@ -33,8 +36,8 @@ api.interceptors.response.use(
 
 // API functions for learning features
 export const learningApi = {
-  fixPhrase: (phrase: string) => 
-    api.post('/fix', { phrase }),
+  fixPhrase: (phrase: string, context?: string) => 
+    api.post('/fix', { phrase, context }),
 
   translate: (text: string, source_language = 'Spanish', target_language = 'English') =>
     api.post('/translate', { text, source_language, target_language }),

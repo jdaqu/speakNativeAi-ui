@@ -1,0 +1,482 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Badge } from '@/components/ui/badge'
+import { 
+  Brain, 
+  Languages, 
+  BookOpen, 
+  X, 
+  Maximize2, 
+  Loader2, 
+  CheckCircle, 
+  AlertCircle,
+  Copy,
+  ExternalLink
+} from 'lucide-react'
+import { learningApi } from '@/lib/api'
+
+// Type definitions
+interface GrammarError {
+  error_type: string
+  explanation: string
+  incorrect: string
+  correct: string
+}
+
+interface FixResponse {
+  original_phrase: string
+  corrected_phrase: string
+  is_correct: boolean
+  grammar_errors: GrammarError[]
+}
+
+interface TranslateResponse {
+  original_text: string
+  primary_translation: string
+  alternatives: Array<{
+    translation: string
+    context: string
+    formality_level: string
+  }>
+}
+
+interface DefineResponse {
+  word: string
+  definitions: Array<{
+    definition: string
+    example: string
+    part_of_speech: string
+  }>
+}
+
+declare global {
+  interface Window {
+    electronAPI?: {
+      hideQuickAccess: () => Promise<void>
+      showMainWindow: () => Promise<void>
+      getPlatform: () => Promise<string>
+      getShortcut: () => Promise<string>
+      isElectron: boolean
+      getApiBaseUrl: () => string
+    }
+  }
+}
+
+export default function QuickAccessPage() {
+  const [activeTab, setActiveTab] = useState('fix')
+  const [platform, setPlatform] = useState('')
+  const [shortcut, setShortcut] = useState('')
+  
+  // Fix states
+  const [fixPhrase, setFixPhrase] = useState('')
+  const [fixLoading, setFixLoading] = useState(false)
+  const [fixResult, setFixResult] = useState<FixResponse | null>(null)
+  
+  // Translate states
+  const [translateText, setTranslateText] = useState('')
+  const [sourceLanguage, setSourceLanguage] = useState('Spanish')
+  const [targetLanguage, setTargetLanguage] = useState('English')
+  const [translateLoading, setTranslateLoading] = useState(false)
+  const [translateResult, setTranslateResult] = useState<TranslateResponse | null>(null)
+  
+  // Define states
+  const [defineWord, setDefineWord] = useState('')
+  const [defineLoading, setDefineLoading] = useState(false)
+  const [defineResult, setDefineResult] = useState<DefineResponse | null>(null)
+  
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    // Get platform info for UI adjustments
+    if (window.electronAPI) {
+      window.electronAPI.getPlatform().then(setPlatform)
+      window.electronAPI.getShortcut().then(setShortcut)
+    }
+  }, [])
+
+  const handleClose = () => {
+    if (window.electronAPI) {
+      window.electronAPI.hideQuickAccess()
+    }
+  }
+
+  const handleOpenFull = () => {
+    if (window.electronAPI) {
+      window.electronAPI.showMainWindow()
+      window.electronAPI.hideQuickAccess()
+    }
+  }
+
+  const handleFixSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!fixPhrase.trim()) return
+
+    setFixLoading(true)
+    setError('')
+    setFixResult(null)
+
+    try {
+      const response = await learningApi.fixPhrase(fixPhrase.trim())
+      setFixResult(response.data)
+    } catch (err: any) {
+      setError(err.response?.data?.detail || 'An error occurred')
+    } finally {
+      setFixLoading(false)
+    }
+  }
+
+  const handleTranslateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!translateText.trim()) return
+
+    setTranslateLoading(true)
+    setError('')
+    setTranslateResult(null)
+
+    try {
+      const response = await learningApi.translate(translateText.trim(), sourceLanguage, targetLanguage)
+      setTranslateResult(response.data)
+    } catch (err: any) {
+      setError(err.response?.data?.detail || 'An error occurred')
+    } finally {
+      setTranslateLoading(false)
+    }
+  }
+
+  const handleDefineSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!defineWord.trim()) return
+
+    setDefineLoading(true)
+    setError('')
+    setDefineResult(null)
+
+    try {
+      const response = await learningApi.define(defineWord.trim())
+      setDefineResult(response.data)
+    } catch (err: any) {
+      setError(err.response?.data?.detail || 'An error occurred')
+    } finally {
+      setDefineLoading(false)
+    }
+  }
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text)
+  }
+
+  const resetFix = () => {
+    setFixPhrase('')
+    setFixResult(null)
+    setError('')
+  }
+
+  const resetTranslate = () => {
+    setTranslateText('')
+    setTranslateResult(null)
+    setError('')
+  }
+
+  const resetDefine = () => {
+    setDefineWord('')
+    setDefineResult(null)
+    setError('')
+  }
+
+  return (
+    <div className="min-h-screen bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <Brain className="h-4 w-4" />
+          <h1 className="text-sm font-semibold">SpeakNative AI</h1>
+        </div>
+        <div className="flex items-center space-x-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleOpenFull}
+            className="h-6 w-6 p-0 text-white hover:bg-white/20"
+          >
+            <ExternalLink className="h-3 w-3" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleClose}
+            className="h-6 w-6 p-0 text-white hover:bg-white/20"
+          >
+            <X className="h-3 w-3" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Shortcut hint */}
+      <div className="px-3 py-2 bg-gray-50 text-xs text-gray-600 text-center border-b">
+        Press <kbd className="px-1 py-0.5 bg-gray-200 rounded text-xs">{shortcut}</kbd> anywhere to open
+      </div>
+
+      {/* Main content */}
+      <div className="p-3">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="fix" className="text-xs">
+              <Brain className="h-3 w-3 mr-1" />
+              Fix
+            </TabsTrigger>
+            <TabsTrigger value="translate" className="text-xs">
+              <Languages className="h-3 w-3 mr-1" />
+              Translate
+            </TabsTrigger>
+            <TabsTrigger value="define" className="text-xs">
+              <BookOpen className="h-3 w-3 mr-1" />
+              Define
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Fix Tab */}
+          <TabsContent value="fix" className="space-y-3 mt-3">
+            <form onSubmit={handleFixSubmit} className="space-y-3">
+              <Textarea
+                placeholder="Enter your English phrase..."
+                value={fixPhrase}
+                onChange={(e) => setFixPhrase(e.target.value)}
+                className="min-h-[60px] text-sm resize-none"
+                disabled={fixLoading}
+              />
+              <div className="flex space-x-2">
+                <Button 
+                  type="submit" 
+                  size="sm" 
+                  disabled={fixLoading || !fixPhrase.trim()}
+                  className="flex-1"
+                >
+                  {fixLoading ? (
+                    <>
+                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                      Fixing...
+                    </>
+                  ) : (
+                    'Fix My English'
+                  )}
+                </Button>
+                {fixResult && (
+                  <Button type="button" variant="outline" size="sm" onClick={resetFix}>
+                    Clear
+                  </Button>
+                )}
+              </div>
+            </form>
+
+            {fixResult && (
+              <div className="space-y-3">
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center space-x-2 mb-2">
+                    {fixResult.is_correct ? (
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <AlertCircle className="h-4 w-4 text-yellow-500" />
+                    )}
+                    <span className="text-sm font-medium">
+                      {fixResult.is_correct ? 'Perfect!' : 'Improved'}
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="p-2 bg-white rounded border text-sm">
+                      {fixResult.corrected_phrase}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard(fixResult.corrected_phrase)}
+                        className="h-6 w-6 p-0 ml-2 float-right"
+                      >
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    {fixResult.grammar_errors.length > 0 && (
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium text-gray-600">Errors found:</p>
+                        {fixResult.grammar_errors.map((error, index) => (
+                          <div key={index} className="text-xs p-2 bg-red-50 rounded">
+                            <Badge variant="secondary" className="text-xs mb-1">
+                              {error.error_type}
+                            </Badge>
+                            <p className="text-gray-700">{error.explanation}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Translate Tab */}
+          <TabsContent value="translate" className="space-y-3 mt-3">
+            <form onSubmit={handleTranslateSubmit} className="space-y-3">
+              <Textarea
+                placeholder="Enter text to translate..."
+                value={translateText}
+                onChange={(e) => setTranslateText(e.target.value)}
+                className="min-h-[60px] text-sm resize-none"
+                disabled={translateLoading}
+              />
+              <div className="grid grid-cols-2 gap-2">
+                <select
+                  value={sourceLanguage}
+                  onChange={(e) => setSourceLanguage(e.target.value)}
+                  className="text-xs p-2 border rounded"
+                  disabled={translateLoading}
+                >
+                  <option value="Spanish">Spanish</option>
+                  <option value="English">English</option>
+                  <option value="French">French</option>
+                  <option value="German">German</option>
+                  <option value="Italian">Italian</option>
+                </select>
+                <select
+                  value={targetLanguage}
+                  onChange={(e) => setTargetLanguage(e.target.value)}
+                  className="text-xs p-2 border rounded"
+                  disabled={translateLoading}
+                >
+                  <option value="English">English</option>
+                  <option value="Spanish">Spanish</option>
+                  <option value="French">French</option>
+                  <option value="German">German</option>
+                  <option value="Italian">Italian</option>
+                </select>
+              </div>
+              <div className="flex space-x-2">
+                <Button 
+                  type="submit" 
+                  size="sm" 
+                  disabled={translateLoading || !translateText.trim()}
+                  className="flex-1"
+                >
+                  {translateLoading ? (
+                    <>
+                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                      Translating...
+                    </>
+                  ) : (
+                    'Translate'
+                  )}
+                </Button>
+                {translateResult && (
+                  <Button type="button" variant="outline" size="sm" onClick={resetTranslate}>
+                    Clear
+                  </Button>
+                )}
+              </div>
+            </form>
+
+            {translateResult && (
+              <div className="space-y-3">
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-xs font-medium text-gray-600 mb-2">Translation:</p>
+                  <div className="p-2 bg-white rounded border text-sm">
+                    {translateResult.primary_translation}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => copyToClipboard(translateResult.primary_translation)}
+                      className="h-6 w-6 p-0 ml-2 float-right"
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  {translateResult.alternatives && translateResult.alternatives.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      <p className="text-xs font-medium text-gray-600">Alternatives:</p>
+                      {translateResult.alternatives.slice(0, 2).map((alt, index) => (
+                        <div key={index} className="text-xs p-2 bg-blue-50 rounded">
+                          <div className="flex items-center justify-between">
+                            <span>{alt.translation}</span>
+                            <Badge variant="outline" className="text-xs">
+                              {alt.formality_level}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Define Tab */}
+          <TabsContent value="define" className="space-y-3 mt-3">
+            <form onSubmit={handleDefineSubmit} className="space-y-3">
+              <Input
+                placeholder="Enter a word to define..."
+                value={defineWord}
+                onChange={(e) => setDefineWord(e.target.value)}
+                className="text-sm"
+                disabled={defineLoading}
+              />
+              <div className="flex space-x-2">
+                <Button 
+                  type="submit" 
+                  size="sm" 
+                  disabled={defineLoading || !defineWord.trim()}
+                  className="flex-1"
+                >
+                  {defineLoading ? (
+                    <>
+                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                      Looking up...
+                    </>
+                  ) : (
+                    'Define Word'
+                  )}
+                </Button>
+                {defineResult && (
+                  <Button type="button" variant="outline" size="sm" onClick={resetDefine}>
+                    Clear
+                  </Button>
+                )}
+              </div>
+            </form>
+
+            {defineResult && (
+              <div className="space-y-3">
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <h4 className="font-medium text-sm mb-2">{defineResult.word}</h4>
+                  <div className="space-y-2">
+                    {defineResult.definitions.slice(0, 3).map((def, index) => (
+                      <div key={index} className="p-2 bg-white rounded border">
+                        <div className="flex items-center justify-between mb-1">
+                          <Badge variant="outline" className="text-xs">
+                            {def.part_of_speech}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-gray-700 mb-1">{def.definition}</p>
+                        <p className="text-xs text-gray-500 italic">{def.example}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+
+        {/* Error display */}
+        {error && (
+          <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-700">
+            {error}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+} 

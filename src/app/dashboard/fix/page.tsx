@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { ArrowLeft, CheckCircle, XCircle, Brain, BookOpen, Target } from 'lucide-react'
+import { ArrowLeft, CheckCircle, XCircle, Brain, BookOpen, Target, Lightbulb, MessageSquare } from 'lucide-react'
 import { learningApi } from '@/lib/api'
 
 interface GrammarError {
@@ -29,6 +29,13 @@ interface PracticeTopic {
   difficulty: string
 }
 
+interface AlternativeExpression {
+  expression: string
+  formality_level: string
+  context_usage: string
+  explanation: string
+}
+
 interface FixResponse {
   original_phrase: string
   corrected_phrase: string
@@ -36,11 +43,14 @@ interface FixResponse {
   grammar_errors: GrammarError[]
   vocabulary_suggestions: VocabularySuggestion[]
   practice_topics: PracticeTopic[]
+  alternative_expressions: AlternativeExpression[]
+  context_analysis?: string
 }
 
 export default function FixPage() {
   const router = useRouter()
   const [phrase, setPhrase] = useState('')
+  const [context, setContext] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<FixResponse | null>(null)
   const [error, setError] = useState('')
@@ -54,7 +64,7 @@ export default function FixPage() {
     setResult(null)
 
     try {
-      const response = await learningApi.fixPhrase(phrase.trim())
+      const response = await learningApi.fixPhrase(phrase.trim(), context.trim() || undefined)
       setResult(response.data)
     } catch (err: any) {
       setError(err.response?.data?.detail || 'An error occurred while processing your phrase')
@@ -65,6 +75,7 @@ export default function FixPage() {
 
   const handleReset = () => {
     setPhrase('')
+    setContext('')
     setResult(null)
     setError('')
   }
@@ -97,13 +108,32 @@ export default function FixPage() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
+                <label htmlFor="phrase" className="block text-sm font-medium text-gray-700 mb-1">
+                  Your English phrase
+                </label>
                 <Textarea
+                  id="phrase"
                   value={phrase}
                   onChange={(e) => setPhrase(e.target.value)}
                   placeholder="e.g., I goes to store yesterday and buy some foods"
                   className="min-h-[100px] resize-vertical"
                   disabled={isLoading}
                 />
+              </div>
+              <div>
+                <label htmlFor="context" className="block text-sm font-medium text-gray-700 mb-1">
+                  Context (optional)
+                </label>
+                <Input
+                  id="context"
+                  value={context}
+                  onChange={(e) => setContext(e.target.value)}
+                  placeholder="e.g., office, surfing, casual conversation, business meeting"
+                  disabled={isLoading}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Provide context to get more relevant vocabulary and suggestions
+                </p>
               </div>
               <div className="flex space-x-2">
                 <Button type="submit" disabled={isLoading || !phrase.trim()}>
@@ -186,6 +216,69 @@ export default function FixPage() {
                           <div>
                             <p className="font-medium text-green-600">Correct:</p>
                             <p className="p-2 bg-green-50 rounded">{error.correct}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Context Analysis */}
+            {result.context_analysis && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <MessageSquare className="h-5 w-5" />
+                    <span>Context Analysis</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-700">{result.context_analysis}</p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Alternative Expressions */}
+            {result.alternative_expressions.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Lightbulb className="h-5 w-5" />
+                    <span>Alternative Ways to Express This ({result.alternative_expressions.length})</span>
+                  </CardTitle>
+                  <CardDescription>
+                    {result.is_correct 
+                      ? "Your phrase is correct! Here are some alternative ways to express the same idea:"
+                      : "Here are some alternative ways to express your idea:"
+                    }
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {result.alternative_expressions.map((alternative, index) => (
+                      <div key={index} className="p-4 border border-gray-200 rounded-md bg-blue-50">
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="font-semibold text-lg text-blue-900">
+                            "{alternative.expression}"
+                          </h4>
+                          <span className={`px-2 py-1 text-xs font-medium rounded ${
+                            alternative.formality_level === 'formal' ? 'bg-purple-100 text-purple-800' :
+                            alternative.formality_level === 'informal' ? 'bg-green-100 text-green-800' :
+                            'bg-orange-100 text-orange-800'
+                          }`}>
+                            {alternative.formality_level}
+                          </span>
+                        </div>
+                        <div className="space-y-2 text-sm">
+                          <div>
+                            <p className="font-medium text-gray-700">When to use:</p>
+                            <p className="text-gray-600">{alternative.context_usage}</p>
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-700">Why this works:</p>
+                            <p className="text-gray-600">{alternative.explanation}</p>
                           </div>
                         </div>
                       </div>
