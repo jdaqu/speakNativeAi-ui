@@ -20,6 +20,7 @@ import {
   ExternalLink
 } from 'lucide-react'
 import { learningApi } from '@/lib/api'
+import { formatApiError } from '@/lib/utils'
 
 // Type definitions
 interface GrammarError {
@@ -125,7 +126,7 @@ export default function QuickAccessPage() {
       const response = await learningApi.fixPhrase(fixPhrase.trim())
       setFixResult(response.data)
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'An error occurred')
+      setError(formatApiError(err))
     } finally {
       setFixLoading(false)
     }
@@ -143,7 +144,7 @@ export default function QuickAccessPage() {
       const response = await learningApi.translate(translateText.trim(), sourceLanguage, targetLanguage)
       setTranslateResult(response.data)
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'An error occurred')
+      setError(formatApiError(err))
     } finally {
       setTranslateLoading(false)
     }
@@ -161,7 +162,7 @@ export default function QuickAccessPage() {
       const response = await learningApi.define(defineWord.trim())
       setDefineResult(response.data)
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'An error occurred')
+      setError(formatApiError(err))
     } finally {
       setDefineLoading(false)
     }

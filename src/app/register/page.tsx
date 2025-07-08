@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Brain, Eye, EyeOff } from 'lucide-react'
+import { formatApiError } from '@/lib/utils'
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -62,7 +63,7 @@ export default function RegisterPage() {
       })
       router.push('/dashboard')
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Registration failed. Please try again.')
+      setError(formatApiError(err))
     } finally {
       setIsLoading(false)
     }

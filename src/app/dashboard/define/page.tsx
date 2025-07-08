@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { ArrowLeft, BookOpen, Volume2, Hash, Quote } from 'lucide-react'
 import { learningApi } from '@/lib/api'
+import { formatApiError } from '@/lib/utils'
 
 interface Definition {
   part_of_speech: string
@@ -42,7 +43,7 @@ export default function DefinePage() {
       const response = await learningApi.define(word.trim(), context.trim() || undefined)
       setResult(response.data)
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'An error occurred while looking up the word')
+      setError(formatApiError(err))
     } finally {
       setIsLoading(false)
     }

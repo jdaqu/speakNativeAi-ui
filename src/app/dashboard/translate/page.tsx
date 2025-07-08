@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { ArrowLeft, Globe, ArrowRightLeft, Languages } from 'lucide-react'
+import { ArrowLeft, Globe, ArrowRightLeft, Languages, Copy, CheckCircle } from 'lucide-react'
 import { learningApi } from '@/lib/api'
+import { formatApiError } from '@/lib/utils'
 
 interface TranslationAlternative {
   translation: string
@@ -37,11 +38,13 @@ const LANGUAGES = [
 export default function TranslatePage() {
   const router = useRouter()
   const [text, setText] = useState('')
-  const [sourceLanguage, setSourceLanguage] = useState('Spanish')
-  const [targetLanguage, setTargetLanguage] = useState('English')
+  const [context, setContext] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<TranslateResponse | null>(null)
   const [error, setError] = useState('')
+
+  const sourceLanguage = 'Spanish'
+  const targetLanguage = 'English'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -52,25 +55,20 @@ export default function TranslatePage() {
     setResult(null)
 
     try {
-      const response = await learningApi.translate(text.trim(), sourceLanguage, targetLanguage)
+      const response = await learningApi.translate(text.trim(), sourceLanguage, targetLanguage, context.trim())
       setResult(response.data)
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'An error occurred while translating your text')
+      setError(formatApiError(err))
     } finally {
       setIsLoading(false)
     }
-  }
-
-  const handleSwapLanguages = () => {
-    setSourceLanguage(targetLanguage)
-    setTargetLanguage(sourceLanguage)
-    setResult(null)
   }
 
   const handleReset = () => {
     setText('')
     setResult(null)
     setError('')
+    setContext('')
   }
 
   const getFormalityColor = (level: string) => {
@@ -113,67 +111,30 @@ export default function TranslatePage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Language Selection */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    From
-                  </label>
-                  <select
-                    value={sourceLanguage}
-                    onChange={(e) => setSourceLanguage(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
-                    disabled={isLoading}
-                  >
-                    {LANGUAGES.map((lang) => (
-                      <option key={lang.code} value={lang.code}>
-                        {lang.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
-                <div className="flex justify-center">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleSwapLanguages}
-                    disabled={isLoading}
-                  >
-                    <ArrowRightLeft className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    To
-                  </label>
-                  <select
-                    value={targetLanguage}
-                    onChange={(e) => setTargetLanguage(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
-                    disabled={isLoading}
-                  >
-                    {LANGUAGES.map((lang) => (
-                      <option key={lang.code} value={lang.code}>
-                        {lang.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
               {/* Text Input */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Text to translate
+                  Text to translate (from Spanish to English)
                 </label>
                 <textarea
                   value={text}
                   onChange={(e) => setText(e.target.value)}
                   placeholder="Enter the text you want to translate..."
                   className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent min-h-[100px] resize-vertical"
+                  disabled={isLoading}
+                />
+              </div>
+
+              {/* Context Input */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Context (optional)
+                </label>
+                <Input
+                  value={context}
+                  onChange={(e) => setContext(e.target.value)}
+                  placeholder="e.g., a business meeting, a casual chat with a friend"
+                  className="w-full"
                   disabled={isLoading}
                 />
               </div>

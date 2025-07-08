@@ -5,7 +5,7 @@ const isElectron = typeof window !== 'undefined' && window.electronAPI?.isElectr
 
 // Create axios instance with base configuration
 export const api = axios.create({
-  baseURL: isElectron ? 'http://localhost:8000/api' : '/api', // Direct API URL for Electron
+  baseURL: isElectron ? 'http://localhost:8000/api/v1' : '/api/v1', // Updated to use v1 API endpoints
   headers: {
     'Content-Type': 'application/json',
   },
@@ -37,13 +37,13 @@ api.interceptors.response.use(
 // API functions for learning features
 export const learningApi = {
   fixPhrase: (phrase: string, context?: string) => 
-    api.post('/fix', { phrase, context }),
+    api.post('/learning/fix', { phrase, context }),
 
-  translate: (text: string, source_language = 'Spanish', target_language = 'English') =>
-    api.post('/translate', { text, source_language, target_language }),
+  translate: (phrase: string, source_language = 'Spanish', target_language = 'English', context?: string) =>
+    api.post('/learning/translate', { phrase, source_language, target_language, context }),
 
   define: (word: string, context?: string) =>
-    api.post('/define', { word, context }),
+    api.post('/learning/define', { word, context }),
 }
 
 // API functions for authentication

@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { ArrowLeft, CheckCircle, XCircle, Brain, BookOpen, Target, Lightbulb, MessageSquare } from 'lucide-react'
 import { learningApi } from '@/lib/api'
+import { formatApiError } from '@/lib/utils'
 
 interface GrammarError {
   error_type: string
@@ -67,7 +68,7 @@ export default function FixPage() {
       const response = await learningApi.fixPhrase(phrase.trim(), context.trim() || undefined)
       setResult(response.data)
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'An error occurred while processing your phrase')
+      setError(formatApiError(err))
     } finally {
       setIsLoading(false)
     }
