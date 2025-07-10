@@ -123,7 +123,7 @@ export default function QuickAccessPage() {
     setFixResult(null)
 
     try {
-      const response = await learningApi.fixPhrase(fixPhrase.trim())
+      const response = await learningApi.fixPhrase(fixPhrase.trim(), undefined)
       setFixResult(response.data)
     } catch (err: any) {
       setError(formatApiError(err))
@@ -141,7 +141,7 @@ export default function QuickAccessPage() {
     setTranslateResult(null)
 
     try {
-      const response = await learningApi.translate(translateText.trim(), sourceLanguage, targetLanguage)
+      const response = await learningApi.translate(translateText.trim(), sourceLanguage, targetLanguage, undefined)
       setTranslateResult(response.data)
     } catch (err: any) {
       setError(formatApiError(err))
@@ -159,7 +159,7 @@ export default function QuickAccessPage() {
     setDefineResult(null)
 
     try {
-      const response = await learningApi.define(defineWord.trim())
+      const response = await learningApi.define(defineWord.trim(), undefined)
       setDefineResult(response.data)
     } catch (err: any) {
       setError(formatApiError(err))
