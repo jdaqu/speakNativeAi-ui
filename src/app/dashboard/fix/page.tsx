@@ -4,11 +4,10 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { ArrowLeft, CheckCircle, XCircle, Brain, BookOpen, Target, Lightbulb, MessageSquare } from 'lucide-react'
 import { learningApi } from '@/lib/api'
-import { formatApiError } from '@/lib/utils'
+import { formatApiError, extractInlineContext } from '@/lib/utils'
 
 interface GrammarError {
   error_type: string
@@ -51,21 +50,21 @@ interface FixResponse {
 export default function FixPage() {
   const router = useRouter()
   const [phrase, setPhrase] = useState('')
-  const [context, setContext] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<FixResponse | null>(null)
   const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!phrase.trim()) return
+    const { text, context } = extractInlineContext(phrase.trim())
+    if (!text) return
 
     setIsLoading(true)
     setError('')
     setResult(null)
 
     try {
-      const response = await learningApi.fixPhrase(phrase.trim(), context.trim() || undefined)
+      const response = await learningApi.fixPhrase(text, context)
       setResult(response.data)
     } catch (err: any) {
       setError(formatApiError(err))
@@ -76,7 +75,6 @@ export default function FixPage() {
 
   const handleReset = () => {
     setPhrase('')
-    setContext('')
     setResult(null)
     setError('')
   }
@@ -121,23 +119,20 @@ export default function FixPage() {
                   disabled={isLoading}
                 />
               </div>
-              <div>
-                <label htmlFor="context" className="block text-sm font-medium text-gray-700 mb-1">
-                  Context (optional)
-                </label>
-                <Input
-                  id="context"
-                  value={context}
-                  onChange={(e) => setContext(e.target.value)}
-                  placeholder="e.g., office, surfing, casual conversation, business meeting"
-                  disabled={isLoading}
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Provide context to get more relevant vocabulary and suggestions
-                </p>
-              </div>
+              {/* Inline context hint */}
+              {extractInlineContext(phrase).context && (
+                <div className="text-sm mt-1">
+                  <span className="font-semibold">Context:</span>{' '}
+                  <span className="font-semibold">{extractInlineContext(phrase).context}</span>
+                </div>
+              )}
               <div className="flex space-x-2">
-                <Button type="submit" disabled={isLoading || !phrase.trim()}>
+                <Button
+                  type="submit"
+                  disabled={
+                    isLoading || !extractInlineContext(phrase.trim()).text
+                  }
+                >
                   {isLoading ? 'Analyzing...' : 'Fix My English'}
                 </Button>
                 {result && (

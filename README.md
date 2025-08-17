@@ -40,6 +40,22 @@ frontend/
 -   **API Client (`src/lib/api.ts`)**: A centralized Axios client for communicating with the backend. It is "Electron-aware," meaning it automatically switches the base URL from a relative path (`/api`) in the web app to a direct URL (`http://localhost:8000/api`) when running inside Electron.
 -   **Auth Context (`src/lib/auth-context.tsx`)**: A React Context that manages the user's authentication state, including the JWT token, user information, and loading status. It provides simple hooks for login, logout, and registration.
 
+#### Inline Context Input (Fix / Translate / Define)
+
+All features support inline context entry directly inside the main input using braces. Example formats:
+
+- Fix: `I goes to store yesterday {casual chat with coworkers}`
+- Translate: `Necesito una reunión {business meeting}`
+- Define: `serendipity {literature class}`
+
+The app will:
+
+- Extract the text and any `{context}` blocks
+- Send the context as a separate parameter to the backend
+- Show a small hint below the input: **Context: <detected context>**
+
+Multiple contexts are supported: `{meeting} {formal}` → sent as `"meeting; formal"`.
+
 ---
 
 ## 🖥️ Desktop App (Electron)

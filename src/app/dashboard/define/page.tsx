@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { ArrowLeft, BookOpen, Volume2, Hash, Quote } from 'lucide-react'
 import { learningApi } from '@/lib/api'
-import { formatApiError } from '@/lib/utils'
+import { formatApiError, extractInlineContext } from '@/lib/utils'
 
 interface Definition {
   part_of_speech: string
@@ -26,21 +26,21 @@ interface DefineResponse {
 export default function DefinePage() {
   const router = useRouter()
   const [word, setWord] = useState('')
-  const [context, setContext] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<DefineResponse | null>(null)
   const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!word.trim()) return
+    const { text, context } = extractInlineContext(word.trim())
+    if (!text) return
 
     setIsLoading(true)
     setError('')
     setResult(null)
 
     try {
-      const response = await learningApi.define(word.trim(), context.trim() || undefined)
+      const response = await learningApi.define(text, context)
       setResult(response.data)
     } catch (err: any) {
       setError(formatApiError(err))
@@ -51,7 +51,6 @@ export default function DefinePage() {
 
   const handleReset = () => {
     setWord('')
-    setContext('')
     setResult(null)
     setError('')
   }
@@ -124,23 +123,19 @@ export default function DefinePage() {
                 />
               </div>
               
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Context (optional)
-                </label>
-                <Input
-                  value={context}
-                  onChange={(e) => setContext(e.target.value)}
-                  placeholder="Provide a sentence or context where you encountered this word..."
-                  disabled={isLoading}
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Adding context helps provide more accurate definitions and examples
-                </p>
-              </div>
+              {/* Inline context hint */}
+              {extractInlineContext(word).context && (
+                <div className="text-sm mt-1">
+                  <span className="font-semibold">Context:</span>{' '}
+                  <span className="font-semibold">{extractInlineContext(word).context}</span>
+                </div>
+              )}
 
               <div className="flex space-x-2">
-                <Button type="submit" disabled={isLoading || !word.trim()}>
+                <Button
+                  type="submit"
+                  disabled={isLoading || !extractInlineContext(word.trim()).text}
+                >
                   {isLoading ? 'Looking up...' : 'Define Word'}
                 </Button>
                 {result && (

@@ -17,10 +17,11 @@ import {
   CheckCircle, 
   AlertCircle,
   Copy,
-  ExternalLink
+  ExternalLink,
+  Lightbulb
 } from 'lucide-react'
 import { learningApi } from '@/lib/api'
-import { formatApiError } from '@/lib/utils'
+import { formatApiError, extractInlineContext } from '@/lib/utils'
 
 // Type definitions
 interface GrammarError {
@@ -30,11 +31,19 @@ interface GrammarError {
   correct: string
 }
 
+interface AlternativeExpression {
+  expression: string
+  formality_level: string
+  context_usage: string
+  explanation: string
+}
+
 interface FixResponse {
   original_phrase: string
   corrected_phrase: string
   is_correct: boolean
   grammar_errors: GrammarError[]
+  alternative_expressions: AlternativeExpression[]
 }
 
 interface TranslateResponse {
@@ -116,14 +125,15 @@ export default function QuickAccessPage() {
 
   const handleFixSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!fixPhrase.trim()) return
+    const { text, context } = extractInlineContext(fixPhrase.trim())
+    if (!text) return
 
     setFixLoading(true)
     setError('')
     setFixResult(null)
 
     try {
-      const response = await learningApi.fixPhrase(fixPhrase.trim(), undefined)
+      const response = await learningApi.fixPhrase(text, context)
       setFixResult(response.data)
     } catch (err: any) {
       setError(formatApiError(err))
@@ -134,14 +144,15 @@ export default function QuickAccessPage() {
 
   const handleTranslateSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!translateText.trim()) return
+    const { text, context } = extractInlineContext(translateText.trim())
+    if (!text) return
 
     setTranslateLoading(true)
     setError('')
     setTranslateResult(null)
 
     try {
-      const response = await learningApi.translate(translateText.trim(), sourceLanguage, targetLanguage, undefined)
+      const response = await learningApi.translate(text, sourceLanguage, targetLanguage, context)
       setTranslateResult(response.data)
     } catch (err: any) {
       setError(formatApiError(err))
@@ -152,14 +163,15 @@ export default function QuickAccessPage() {
 
   const handleDefineSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!defineWord.trim()) return
+    const { text, context } = extractInlineContext(defineWord.trim())
+    if (!text) return
 
     setDefineLoading(true)
     setError('')
     setDefineResult(null)
 
     try {
-      const response = await learningApi.define(defineWord.trim(), undefined)
+      const response = await learningApi.define(text, context)
       setDefineResult(response.data)
     } catch (err: any) {
       setError(formatApiError(err))
@@ -251,11 +263,17 @@ export default function QuickAccessPage() {
                 className="min-h-[60px] text-sm resize-none"
                 disabled={fixLoading}
               />
+              {extractInlineContext(fixPhrase).context && (
+                <div className="text-xs mt-1">
+                  <span className="font-semibold">Context:</span>{' '}
+                  <span className="font-semibold">{extractInlineContext(fixPhrase).context}</span>
+                </div>
+              )}
               <div className="flex space-x-2">
                 <Button 
                   type="submit" 
                   size="sm" 
-                  disabled={fixLoading || !fixPhrase.trim()}
+                  disabled={fixLoading || !extractInlineContext(fixPhrase.trim()).text}
                   className="flex-1"
                 >
                   {fixLoading ? (
@@ -300,6 +318,34 @@ export default function QuickAccessPage() {
                         <Copy className="h-3 w-3" />
                       </Button>
                     </div>
+                    {/* Native alternative (first alternative expression) */}
+                    {fixResult.alternative_expressions && fixResult.alternative_expressions.length > 0 && (
+                      <div className="p-2 bg-blue-50 rounded border border-blue-200">
+                        <div className="flex items-center text-xs font-medium text-blue-800 mb-1">
+                          <Lightbulb className="h-3 w-3 mr-1" />
+                          More native alternative
+                        </div>
+                        <div className="p-2 bg-white rounded border text-sm">
+                          {fixResult.alternative_expressions[0].expression}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => copyToClipboard(fixResult.alternative_expressions[0].expression)}
+                            className="h-6 w-6 p-0 ml-2 float-right"
+                          >
+                            <Copy className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        <div className="mt-1 flex items-center justify-between">
+                          <span className="text-[10px] px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded">
+                            {fixResult.alternative_expressions[0].formality_level}
+                          </span>
+                        </div>
+                        <p className="text-xs text-blue-900 mt-1">
+                          {fixResult.alternative_expressions[0].explanation}
+                        </p>
+                      </div>
+                    )}
                     {fixResult.grammar_errors.length > 0 && (
                       <div className="space-y-1">
                         <p className="text-xs font-medium text-gray-600">Errors found:</p>
@@ -308,7 +354,17 @@ export default function QuickAccessPage() {
                             <Badge variant="secondary" className="text-xs mb-1">
                               {error.error_type}
                             </Badge>
-                            <p className="text-gray-700">{error.explanation}</p>
+                            <p className="text-gray-700 mb-1">{error.explanation}</p>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <p className="text-[10px] font-medium text-red-700">Incorrect</p>
+                                <p className="p-1 bg-white/70 border border-red-200 rounded text-[11px]">{error.incorrect}</p>
+                              </div>
+                              <div>
+                                <p className="text-[10px] font-medium text-green-700">Correct</p>
+                                <p className="p-1 bg-white/70 border border-green-200 rounded text-[11px]">{error.correct}</p>
+                              </div>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -329,6 +385,12 @@ export default function QuickAccessPage() {
                 className="min-h-[60px] text-sm resize-none"
                 disabled={translateLoading}
               />
+              {extractInlineContext(translateText).context && (
+                <div className="text-xs mt-1">
+                  <span className="font-semibold">Context:</span>{' '}
+                  <span className="font-semibold">{extractInlineContext(translateText).context}</span>
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-2">
                 <select
                   value={sourceLanguage}
@@ -359,7 +421,7 @@ export default function QuickAccessPage() {
                 <Button 
                   type="submit" 
                   size="sm" 
-                  disabled={translateLoading || !translateText.trim()}
+                  disabled={translateLoading || !extractInlineContext(translateText.trim()).text}
                   className="flex-1"
                 >
                   {translateLoading ? (
@@ -424,11 +486,17 @@ export default function QuickAccessPage() {
                 className="text-sm"
                 disabled={defineLoading}
               />
+              {extractInlineContext(defineWord).context && (
+                <div className="text-xs mt-1">
+                  <span className="font-semibold">Context:</span>{' '}
+                  <span className="font-semibold">{extractInlineContext(defineWord).context}</span>
+                </div>
+              )}
               <div className="flex space-x-2">
                 <Button 
                   type="submit" 
                   size="sm" 
-                  disabled={defineLoading || !defineWord.trim()}
+                  disabled={defineLoading || !extractInlineContext(defineWord.trim()).text}
                   className="flex-1"
                 >
                   {defineLoading ? (

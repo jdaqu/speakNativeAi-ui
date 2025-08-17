@@ -4,10 +4,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { ArrowLeft, Globe, ArrowRightLeft, Languages, Copy, CheckCircle } from 'lucide-react'
 import { learningApi } from '@/lib/api'
-import { formatApiError } from '@/lib/utils'
+import { formatApiError, extractInlineContext } from '@/lib/utils'
 
 interface TranslationAlternative {
   translation: string
@@ -38,7 +37,6 @@ const LANGUAGES = [
 export default function TranslatePage() {
   const router = useRouter()
   const [text, setText] = useState('')
-  const [context, setContext] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<TranslateResponse | null>(null)
   const [error, setError] = useState('')
@@ -48,14 +46,20 @@ export default function TranslatePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!text.trim()) return
+    const { text: cleanText, context } = extractInlineContext(text.trim())
+    if (!cleanText) return
 
     setIsLoading(true)
     setError('')
     setResult(null)
 
     try {
-      const response = await learningApi.translate(text.trim(), sourceLanguage, targetLanguage, context.trim())
+      const response = await learningApi.translate(
+        cleanText,
+        sourceLanguage,
+        targetLanguage,
+        context
+      )
       setResult(response.data)
     } catch (err: any) {
       setError(formatApiError(err))
@@ -68,7 +72,6 @@ export default function TranslatePage() {
     setText('')
     setResult(null)
     setError('')
-    setContext('')
   }
 
   const getFormalityColor = (level: string) => {
@@ -125,22 +128,19 @@ export default function TranslatePage() {
                 />
               </div>
 
-              {/* Context Input */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Context (optional)
-                </label>
-                <Input
-                  value={context}
-                  onChange={(e) => setContext(e.target.value)}
-                  placeholder="e.g., a business meeting, a casual chat with a friend"
-                  className="w-full"
-                  disabled={isLoading}
-                />
-              </div>
+              {/* Inline context hint */}
+              {extractInlineContext(text).context && (
+                <div className="text-sm mt-1">
+                  <span className="font-semibold">Context:</span>{' '}
+                  <span className="font-semibold">{extractInlineContext(text).context}</span>
+                </div>
+              )}
 
               <div className="flex space-x-2">
-                <Button type="submit" disabled={isLoading || !text.trim()}>
+                <Button
+                  type="submit"
+                  disabled={isLoading || !extractInlineContext(text.trim()).text}
+                >
                   {isLoading ? 'Translating...' : 'Translate'}
                 </Button>
                 {result && (

@@ -48,3 +48,14 @@ export function formatApiError(error: any): string {
   // Fallback
   return 'An unexpected error occurred'
 } 
+
+// Extract inline context marked as {context} from a free-form input string.
+// Supports multiple {..} blocks; removes them from the returned text and joins contexts with "; ".
+export function extractInlineContext(input: string): { text: string; context?: string } {
+  if (!input) return { text: '' }
+  const matches = Array.from(input.matchAll(/\{([^}]+)\}/g))
+  const contexts = matches.map((m) => m[1].trim()).filter(Boolean)
+  const text = input.replace(/\{[^}]+\}/g, '').replace(/\s+/g, ' ').trim()
+  if (contexts.length === 0) return { text }
+  return { text, context: contexts.join('; ') }
+}

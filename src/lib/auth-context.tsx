@@ -47,14 +47,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const token = Cookies.get('access_token')
       if (token) {
-        // Set the token in API headers
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`
-        // Get user info
         const response = await api.get('/auth/me')
         setUser(response.data)
       }
     } catch (error) {
-      // Token is invalid, remove it
       Cookies.remove('access_token')
       delete api.defaults.headers.common['Authorization']
     } finally {
@@ -65,21 +62,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     try {
       const response = await api.post('/auth/login', { email, password })
-      const { access_token, refresh_token, expires_in } = response.data
+      const { access_token, refresh_token } = response.data
       
-      // Store tokens in cookies
-      Cookies.set('access_token', access_token, { expires: expires_in ? expires_in / 86400 : 7 }) // expires_in is in seconds, convert to days
+      Cookies.set('access_token', access_token)
       if (refresh_token) {
-        Cookies.set('refresh_token', refresh_token, { expires: 30 }) // 30 days default
-      }
-      if (expires_in) {
-        Cookies.set('expires_in', String(expires_in), { expires: expires_in / 86400 })
+        Cookies.set('refresh_token', refresh_token, { expires: 30 }) // 30 days
       }
       
-      // Set token in API headers
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
       
-      // Get user info
       await checkAuth()
     } catch (error) {
       throw error
@@ -89,19 +80,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (userData: RegisterData) => {
     try {
       await api.post('/auth/register', userData)
-      // After successful registration, log in the user
       await login(userData.email, userData.password)
     } catch (error) {
       throw error
     }
   }
 
-  const logout = () => {
-    Cookies.remove('access_token')
-    Cookies.remove('refresh_token')
-    Cookies.remove('expires_in')
-    delete api.defaults.headers.common['Authorization']
-    setUser(null)
+  const logout = async () => {
+    try {
+      await api.post('/auth/logout')
+    } catch (error) {
+      console.error('Logout failed', error)
+    } finally {
+      Cookies.remove('access_token')
+      Cookies.remove('refresh_token')
+      delete api.defaults.headers.common['Authorization']
+      setUser(null)
+    }
   }
 
   const value = {
@@ -122,4 +117,4 @@ export function useAuth() {
     throw new Error('useAuth must be used within an AuthProvider')
   }
   return context
-} 
+}
