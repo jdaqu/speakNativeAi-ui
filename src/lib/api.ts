@@ -74,9 +74,8 @@ api.interceptors.response.use(
       originalRequest._retry = true
       isRefreshing = true
 
-      // Prefer HttpOnly cookie. Presence in js-cookie is not required
       const refreshToken = Cookies.get('refresh_token')
-      if (refreshToken !== undefined || true) {
+      if (refreshToken) {
         try {
           const response = await api.post('/auth/refresh')
           const { access_token } = response.data
@@ -87,15 +86,20 @@ api.interceptors.response.use(
           return api(originalRequest)
         } catch (refreshError) {
           processQueue(refreshError, null)
-          Cookies.remove('access_token')
-          Cookies.remove('refresh_token')
-          window.location.href = '/login'
+          logout()
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login'
+          }
           return Promise.reject(refreshError)
         } finally {
           isRefreshing = false
         }
       } else {
-        window.location.href = '/login'
+        logout()
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login'
+        }
+        return Promise.reject(error)
       }
     }
     return Promise.reject(error)

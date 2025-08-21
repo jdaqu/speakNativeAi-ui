@@ -1,5 +1,6 @@
 import { Inter, JetBrains_Mono } from "next/font/google";
 import '../globals.css'
+import { AuthProvider } from '@/lib/auth-context'
 
 const inter = Inter({
   subsets: ["latin"],
@@ -19,7 +20,9 @@ export default function QuickAccessLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased font-sans`}>
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   )

@@ -2,14 +2,20 @@
 
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Brain, MessageCircle, Globe, BookOpen, User, LogOut } from 'lucide-react'
+import { Brain, User, LogOut, Languages, BookOpen } from 'lucide-react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import Fix from './components/Fix'
+import Translate from './components/Translate'
+import Define from './components/Define'
+import LearningPathViewer from './components/LearningPathViewer'
+import { LearningToast } from '@/components/ui/learning-toast'
 
 export default function DashboardPage() {
   const { user, isAuthenticated, isLoading, logout } = useAuth()
   const router = useRouter()
+  const [activeTab, setActiveTab] = useState('fix')
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -58,120 +64,40 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {user.full_name || user.username}!
-          </h1>
-          <p className="text-gray-600">
-            Ready to continue your English learning journey? Choose a learning mode below.
-          </p>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="fix">
+                  <Brain className="h-4 w-4 mr-2" />
+                  Fix My English
+                </TabsTrigger>
+                <TabsTrigger value="translate">
+                  <Languages className="h-4 w-4 mr-2" />
+                  Smart Translator
+                </TabsTrigger>
+                <TabsTrigger value="define">
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  Word Definitions
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="fix" className="mt-6">
+                <Fix />
+              </TabsContent>
+              <TabsContent value="translate" className="mt-6">
+                <Translate />
+              </TabsContent>
+              <TabsContent value="define" className="mt-6">
+                <Define />
+              </TabsContent>
+            </Tabs>
+          </div>
+          <div className="lg:col-span-1">
+            <LearningPathViewer />
+          </div>
         </div>
-
-        {/* Learning Features */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/dashboard/fix')}>
-            <CardHeader>
-              <MessageCircle className="h-12 w-12 text-primary mb-4" />
-              <CardTitle>Fix My English</CardTitle>
-              <CardDescription>
-                Write a sentence and get instant grammar corrections and improvements
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full" onClick={(e) => {
-                e.stopPropagation()
-                router.push('/dashboard/fix')
-              }}>
-                Start Fixing
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/dashboard/translate')}>
-            <CardHeader>
-              <Globe className="h-12 w-12 text-primary mb-4" />
-              <CardTitle>Smart Translator</CardTitle>
-              <CardDescription>
-                Translate text with context and get multiple natural alternatives
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full" onClick={(e) => {
-                e.stopPropagation()
-                router.push('/dashboard/translate')
-              }}>
-                Start Translating
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/dashboard/define')}>
-            <CardHeader>
-              <BookOpen className="h-12 w-12 text-primary mb-4" />
-              <CardTitle>Word Definitions</CardTitle>
-              <CardDescription>
-                Look up words and build your vocabulary with detailed explanations
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full" onClick={(e) => {
-                e.stopPropagation()
-                router.push('/dashboard/define')
-              }}>
-                Look Up Words
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* User Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardDescription>Native Language</CardDescription>
-              <CardTitle className="text-lg">{user.native_language}</CardTitle>
-            </CardHeader>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardDescription>Learning</CardDescription>
-              <CardTitle className="text-lg">{user.target_language}</CardTitle>
-            </CardHeader>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardDescription>Practice Sessions</CardDescription>
-              <CardTitle className="text-lg">0</CardTitle>
-            </CardHeader>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardDescription>Words Learned</CardDescription>
-              <CardTitle className="text-lg">0</CardTitle>
-            </CardHeader>
-          </Card>
-        </div>
-
-        {/* Recent Activity */}
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>
-              Your latest learning sessions and progress
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8 text-gray-500">
-              <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No recent activity yet. Start learning to see your progress here!</p>
-            </div>
-          </CardContent>
-        </Card>
       </main>
+      <LearningToast />
     </div>
   )
 } 
