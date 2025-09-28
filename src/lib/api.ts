@@ -74,32 +74,26 @@ api.interceptors.response.use(
       originalRequest._retry = true
       isRefreshing = true
 
-      const refreshToken = Cookies.get('refresh_token')
-      if (refreshToken) {
-        try {
-          const response = await api.post('/auth/refresh')
-          const { access_token } = response.data
-          Cookies.set('access_token', access_token)
-          api.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
-          originalRequest.headers['Authorization'] = 'Bearer ' + access_token
-          processQueue(null, access_token)
-          return api(originalRequest)
-        } catch (refreshError) {
-          processQueue(refreshError, null)
-          logout()
-          if (typeof window !== 'undefined') {
-            window.location.href = '/login'
-          }
-          return Promise.reject(refreshError)
-        } finally {
-          isRefreshing = false
-        }
-      } else {
+      try {
+        // Don't check for refresh token cookie since it's HttpOnly
+        // Just attempt refresh - backend will use HttpOnly cookie
+        const response = await api.post('/auth/refresh')
+        const { access_token } = response.data
+
+        Cookies.set('access_token', access_token)
+        api.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
+        originalRequest.headers['Authorization'] = 'Bearer ' + access_token
+        processQueue(null, access_token)
+        return api(originalRequest)
+      } catch (refreshError) {
+        processQueue(refreshError, null)
         logout()
         if (typeof window !== 'undefined') {
           window.location.href = '/login'
         }
-        return Promise.reject(error)
+        return Promise.reject(refreshError)
+      } finally {
+        isRefreshing = false
       }
     }
     return Promise.reject(error)
@@ -110,7 +104,7 @@ export const logout = () => {
   isRefreshing = false
   failedQueue = []
   Cookies.remove('access_token')
-  Cookies.remove('refresh_token')
+  // refresh_token is HttpOnly and cleared by backend
   delete api.defaults.headers.common['Authorization']
 }
 

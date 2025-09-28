@@ -62,15 +62,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     try {
       const response = await api.post('/auth/login', { email, password })
-      const { access_token, refresh_token } = response.data
-      
+      const { access_token } = response.data
+
+      // Only store access token - refresh token is HttpOnly cookie from backend
       Cookies.set('access_token', access_token)
-      if (refresh_token) {
-        Cookies.set('refresh_token', refresh_token, { expires: 30 }) // 30 days
-      }
-      
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
-      
+
       await checkAuth()
     } catch (error) {
       throw error
@@ -93,7 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Logout failed', error)
     } finally {
       Cookies.remove('access_token')
-      Cookies.remove('refresh_token')
+      // refresh_token is HttpOnly and cleared by backend
       delete api.defaults.headers.common['Authorization']
       setUser(null)
     }
