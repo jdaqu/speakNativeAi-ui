@@ -1,0 +1,102 @@
+{
+  "name": "speaknative-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "main": "electron/main.js",
+  "homepage": "./",
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "dev:prod": "cross-env NEXT_PUBLIC_API_URL=https://speaknativeai-api-production.up.railway.app next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "electron": "electron .",
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .\"",
+    "electron:build": "cross-env ELECTRON=true NEXT_PUBLIC_API_URL=https://speaknativeai-api-production.up.railway.app npm run build && electron-builder",
+    "electron:build:arm64": "cross-env ELECTRON=true NEXT_PUBLIC_API_URL=https://speaknativeai-api-production.up.railway.app npm run build && electron-builder --mac --arm64",
+    "electron:build:intel": "cross-env ELECTRON=true NEXT_PUBLIC_API_URL=https://speaknativeai-api-production.up.railway.app npm run build && electron-builder --mac --x64",
+    "electron:pack": "cross-env ELECTRON=true NEXT_PUBLIC_API_URL=https://speaknativeai-api-production.up.railway.app npm run build && node fix-paths.js && electron-builder --publish=never",
+    "electron:dist": "cross-env ELECTRON=true NEXT_PUBLIC_API_URL=https://speaknativeai-api-production.up.railway.app npm run build && electron-builder --publish=always"
+  },
+  "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.14",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tabs": "^1.1.12",
+    "@radix-ui/react-toast": "^1.2.14",
+    "@types/js-cookie": "^3.0.6",
+    "autoprefixer": "^10.4.21",
+    "axios": "^1.9.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "js-cookie": "^3.0.5",
+    "lucide-react": "^0.511.0",
+    "next": "15.3.3",
+    "postcss": "^8.5.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwind-merge": "^3.3.0",
+    "tailwindcss": "^3.4.17",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "concurrently": "^9.0.1",
+    "cross-env": "^7.0.3",
+    "electron": "^32.0.0",
+    "electron-builder": "^25.0.0",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.3",
+    "typescript": "^5",
+    "wait-on": "^8.0.1"
+  },
+  "build": {
+    "appId": "com.speaknative.desktop",
+    "productName": "SpeakNative AI",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "out/**/*",
+      "!out/downloads/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.education",
+      "identity": null,
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    }
+  }
+}

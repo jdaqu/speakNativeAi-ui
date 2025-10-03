@@ -1,0 +1,87 @@
+name: Build and Release Desktop App
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+jobs:
+  build-and-release:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Next.js app
+        run: npm run build
+
+      - name: Install Electron Builder
+        run: npm install --save-dev electron-builder
+
+      - name: Build both ARM64 and Intel versions
+        run: |
+          # Build ARM64 version
+          npm run electron:build:arm64
+          # Rename ARM64 file
+          mv dist/*.dmg dist/SpeakNativeAI-mac-arm64.dmg
+          
+          # Build Intel version
+          npm run electron:build:intel
+          # Rename Intel file
+          mv dist/*.dmg dist/SpeakNativeAI-mac-intel.dmg
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-builds-${{ github.sha }}
+          path: dist/*.dmg
+          retention-days: 30
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name || inputs.version }}
+          name: Release ${{ github.ref_name || inputs.version }}
+          body: |
+            ## Desktop App Release ${{ github.ref_name || inputs.version }}
+            
+            ### Downloads
+            - **Mac (Apple Silicon)**: Download the ARM64 version for M1/M2 Macs
+            - **Mac (Intel)**: Download the Intel version for Intel-based Macs
+            
+            ### Features
+            - Global hotkey access (Cmd+Shift+S)
+            - Quick Fix, Translate & Define popup
+            - Works offline for cached content
+            - System tray integration
+            - Auto-updates for latest features
+            - Native OS integration
+            
+            ### Installation
+            1. Download the appropriate version for your Mac
+            2. Open the .dmg file
+            3. Drag SpeakNative AI to your Applications folder
+            4. Launch the app and sign in with your account
+          files: |
+            dist/*.dmg
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
