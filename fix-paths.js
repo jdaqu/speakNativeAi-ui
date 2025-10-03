@@ -41,6 +41,14 @@ function fixPaths(dir, depth = 0) {
         });
 
         fs.writeFileSync(filePath, content);
+      } else if (file.endsWith('.css')) {
+        console.log(`Fixing font paths in: ${filePath}`);
+        let content = fs.readFileSync(filePath, 'utf8');
+
+        // Fix font file paths in CSS
+        content = content.replace(/url\(\/_next\//g, `url(${prefix}_next/`);
+
+        fs.writeFileSync(filePath, content);
       }
     }
   } catch (error) {

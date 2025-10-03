@@ -32,10 +32,9 @@ const createMainWindow = () => {
     mainWindow.webContents.openDevTools()
   } else {
     console.log('Loading from file:', path.join(__dirname, '../out/index.html'))
-    mainWindow.loadFile(path.join(__dirname, '../out/index.html'))
-
-    // Open DevTools in production builds to help debug
-    mainWindow.webContents.openDevTools()
+    // Use loadURL with file protocol for better path resolution
+    const filePath = path.join(__dirname, '../out/index.html')
+    mainWindow.loadURL(`file://${filePath}`)
   }
 
   mainWindow.on('closed', () => {
@@ -83,7 +82,8 @@ const createQuickAccessWindow = () => {
   if (isDev) {
     quickAccessWindow.loadURL('http://localhost:3000/quick-access')
   } else {
-    quickAccessWindow.loadFile(path.join(__dirname, '../out/quick-access/index.html'))
+    const quickAccessPath = path.join(__dirname, '../out/quick-access/index.html')
+    quickAccessWindow.loadURL(`file://${quickAccessPath}`)
   }
 
   quickAccessWindow.on('closed', () => {
