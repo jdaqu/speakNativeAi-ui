@@ -31,7 +31,7 @@ export default function LoginPage() {
     try {
       await login(email, password)
       navigation.goto('/dashboard')
-    } catch (err: any) {
+    } catch (err: unknown) {
         setError(formatApiError(err))
       } finally {
       setIsLoading(false)
@@ -112,7 +112,7 @@ export default function LoginPage() {
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                Don't have an account?{' '}
+                Don&apos;t have an account?{' '}
                 <a href={navigation.getHref('/register')} className="text-primary hover:underline font-medium">
                   Sign up here
                 </a>

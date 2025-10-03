@@ -63,7 +63,7 @@ export default function RegisterPage() {
         target_language: formData.target_language
       })
       navigation.goto('/dashboard')
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(formatApiError(err))
     } finally {
       setIsLoading(false)

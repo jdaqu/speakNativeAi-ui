@@ -29,7 +29,7 @@ export default function HomePage() {
   useEffect(() => {
     // Check Electron status on mount
     setIsMounted(true)
-    setIsElectron(!!(window as any).electronAPI?.isElectron)
+    setIsElectron(!!(window as unknown as { electronAPI?: { isElectron?: boolean } }).electronAPI?.isElectron)
   }, [])
 
   // Load download URLs when component mounts (only for web, not Electron)
@@ -73,7 +73,7 @@ export default function HomePage() {
     try {
       await login(email, password)
       navigation.goto('/dashboard')
-    } catch (err: any) {
+    } catch (err: unknown) {
       setLoginError(formatApiError(err))
     } finally {
       setIsSubmitting(false)
@@ -167,7 +167,7 @@ export default function HomePage() {
 
               <div className="mt-6 text-center">
                 <p className="text-sm text-gray-600">
-                  Don't have an account?{' '}
+                  Don&apos;t have an account?{' '}
                   <a href={navigation.getHref('/register')} className="text-primary hover:underline font-medium">
                     Sign up here
                   </a>

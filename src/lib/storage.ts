@@ -16,13 +16,13 @@ export const storage = {
 
     if (isElectron()) {
       // Check if we have electronAPI available
-      if (typeof window !== 'undefined' && (window as any).electronAPI?.getSharedToken) {
+      if (typeof window !== 'undefined' && (window as unknown as { electronAPI?: { getSharedToken?: () => Promise<string> } }).electronAPI?.getSharedToken) {
         // Use cached value if available
         if (electronTokenCache !== null) {
           return electronTokenCache
         }
         // Get token from shared storage via IPC
-        const token = await (window as any).electronAPI.getSharedToken()
+        const token = await (window as unknown as { electronAPI: { getSharedToken: () => Promise<string> } }).electronAPI.getSharedToken()
         electronTokenCache = token
         return token
       }
@@ -58,9 +58,9 @@ export const storage = {
       // Update cache
       electronTokenCache = token
       // Check if we have electronAPI available
-      if (typeof window !== 'undefined' && (window as any).electronAPI?.setSharedToken) {
+      if (typeof window !== 'undefined' && (window as unknown as { electronAPI?: { setSharedToken?: (token: string) => Promise<void> } }).electronAPI?.setSharedToken) {
         // Use shared storage via IPC
-        await (window as any).electronAPI.setSharedToken(token)
+        await (window as unknown as { electronAPI: { setSharedToken: (token: string) => Promise<void> } }).electronAPI.setSharedToken(token)
       }
       // Also set in localStorage as fallback
       localStorage.setItem('access_token', token)
@@ -77,9 +77,9 @@ export const storage = {
       // Clear cache
       electronTokenCache = null
       // Check if we have electronAPI available
-      if (typeof window !== 'undefined' && (window as any).electronAPI?.removeSharedToken) {
+      if (typeof window !== 'undefined' && (window as unknown as { electronAPI?: { removeSharedToken?: () => Promise<void> } }).electronAPI?.removeSharedToken) {
         // Remove from shared storage via IPC
-        await (window as any).electronAPI.removeSharedToken()
+        await (window as unknown as { electronAPI: { removeSharedToken: () => Promise<void> } }).electronAPI.removeSharedToken()
       }
       // Also remove from localStorage
       localStorage.removeItem('access_token')

@@ -14,7 +14,7 @@ export function formatApiError(error: unknown): string {
   
   // If it's an axios error with response data
   if (error && typeof error === 'object' && 'response' in error && error.response && typeof error.response === 'object' && 'data' in error.response) {
-    const errorData = (error as any).response.data
+    const errorData = (error as { response: { data: unknown } }).response.data as { detail?: string | unknown[]; message?: string }
     
     // If detail is a string, return it
     if (typeof errorData.detail === 'string') {
@@ -27,8 +27,9 @@ export function formatApiError(error: unknown): string {
         .map((err: unknown) => {
           if (typeof err === 'string') return err
           if (err && typeof err === 'object' && 'msg' in err) {
-            const field = (err as any).loc ? (err as any).loc.join(' → ') : 'Unknown field'
-            return `${field}: ${(err as any).msg}`
+            const errObj = err as { loc?: string[]; msg: string }
+            const field = errObj.loc ? errObj.loc.join(' → ') : 'Unknown field'
+            return `${field}: ${errObj.msg}`
           }
           return 'Validation error'
         })
@@ -43,8 +44,8 @@ export function formatApiError(error: unknown): string {
   }
   
   // If it's a direct error message
-  if (error && typeof error === 'object' && 'message' in error && typeof (error as any).message === 'string') {
-    return (error as any).message
+  if (error && typeof error === 'object' && 'message' in error && typeof (error as { message: unknown }).message === 'string') {
+    return (error as { message: string }).message
   }
   
   // Fallback

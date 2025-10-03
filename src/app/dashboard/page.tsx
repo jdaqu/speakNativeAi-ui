@@ -23,7 +23,7 @@ export default function DashboardPage() {
     if (typeof window !== 'undefined') {
       const token = storage.getToken()
       setHasToken(!!token)
-      setIsElectron(!!(window as any).electronAPI?.isElectron)
+      setIsElectron(!!(window as unknown as { electronAPI?: { isElectron?: boolean } }).electronAPI?.isElectron)
       setDebugInfo(`Loading: ${isLoading}, Auth: ${isAuthenticated}, User: ${!!user}, Token: ${!!token}`)
 
       // Mark that we've checked auth at least once

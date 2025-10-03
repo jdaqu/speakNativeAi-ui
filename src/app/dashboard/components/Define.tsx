@@ -66,8 +66,9 @@ export default function Define() {
 
   const getPartOfSpeechVariant = (pos: string): 'noun' | 'verb' | 'adjective' | 'adverb' | 'preposition' | 'pronoun' | 'conjunction' | 'interjection' => {
     const normalized = pos.toLowerCase()
-    if (['noun', 'verb', 'adjective', 'adverb', 'preposition', 'pronoun', 'conjunction', 'interjection'].includes(normalized)) {
-      return normalized as any
+    const validPartsOfSpeech = ['noun', 'verb', 'adjective', 'adverb', 'preposition', 'pronoun', 'conjunction', 'interjection'] as const
+    if (validPartsOfSpeech.includes(normalized as typeof validPartsOfSpeech[number])) {
+      return normalized as 'noun' | 'verb' | 'adjective' | 'adverb' | 'preposition' | 'pronoun' | 'conjunction' | 'interjection'
     }
     return 'noun' // default fallback
   }

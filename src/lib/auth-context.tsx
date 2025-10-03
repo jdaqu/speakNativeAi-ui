@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         )
 
         const authPromise = api.get('/auth/me')
-        const response = await Promise.race([authPromise, timeoutPromise]) as any
+        const response = await Promise.race([authPromise, timeoutPromise]) as { data: User }
         setUser(response.data)
       }
     } catch (err: unknown) {
@@ -94,9 +94,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
 
       await checkAuth()
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Provide user-friendly error messages
-      if (error?.code === 'ECONNREFUSED' || error?.message?.includes('Network Error')) {
+      const errorObj = error as { code?: string; message?: string }
+      if (errorObj?.code === 'ECONNREFUSED' || errorObj?.message?.includes('Network Error')) {
         throw new Error('Cannot connect to server. Please make sure the backend is running.')
       }
       throw error

@@ -51,7 +51,7 @@ export default function Translate() {
         extractedContext
       )
       setResult(response.data)
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(formatApiError(err))
     } finally {
       setIsLoading(false)

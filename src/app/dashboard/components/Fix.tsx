@@ -68,7 +68,7 @@ export default function Fix() {
     try {
       const response = await learningApi.fixPhrase(extractedText, extractedContext)
       setResult(response.data)
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(formatApiError(err))
     } finally {
       setIsLoading(false)
@@ -127,7 +127,7 @@ export default function Fix() {
         <div className="space-y-6">
           {/* Correction Result */}
           <ResultCard
-            title={result.is_correct ? 'Great! Your phrase is correct' : 'Here\'s the improved version'}
+            title={result.is_correct ? 'Great! Your phrase is correct' : 'Here&apos;s the improved version'}
             original={result.original_phrase}
             corrected={result.corrected_phrase}
             isCorrect={result.is_correct}
@@ -191,7 +191,7 @@ export default function Fix() {
                   <div key={index} className="p-4 border border-gray-200 rounded-md bg-blue-50">
                     <div className="flex items-start justify-between mb-2">
                       <h4 className="font-semibold text-lg text-blue-900">
-                        "{alternative.expression}"
+                        &ldquo;{alternative.expression}&rdquo;
                       </h4>
                       <FormalityBadge level={alternative.formality_level as 'formal' | 'informal' | 'neutral'} />
                     </div>

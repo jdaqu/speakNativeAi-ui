@@ -1,13 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Textarea, Tabs, TabsContent, TabsList, TabsTrigger, Badge } from '@/components/ui'
+import { Button, Input, Textarea, Tabs, TabsContent, TabsList, TabsTrigger, Badge } from '@/components/ui'
 import { 
   Brain, 
   Languages, 
   BookOpen, 
   X, 
-  Maximize2, 
   Loader2, 
   CheckCircle, 
   AlertCircle,
@@ -63,7 +62,6 @@ interface DefineResponse {
 
 export default function QuickAccessPage() {
   const [activeTab, setActiveTab] = useState('fix')
-  const [platform, setPlatform] = useState('')
   const [shortcut, setShortcut] = useState('')
   
   // Fix states
@@ -88,9 +86,8 @@ export default function QuickAccessPage() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    // Get platform info for UI adjustments
+    // Get shortcut info for UI adjustments
     if (window.electronAPI) {
-      window.electronAPI.getPlatform().then(setPlatform)
       window.electronAPI.getShortcut().then(setShortcut)
     }
   }, [])
@@ -120,7 +117,7 @@ export default function QuickAccessPage() {
     try {
       const response = await learningApi.fixPhrase(text, context)
       setFixResult(response.data)
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(formatApiError(err))
     } finally {
       setFixLoading(false)
@@ -139,7 +136,7 @@ export default function QuickAccessPage() {
     try {
       const response = await learningApi.translate(text, sourceLanguage, targetLanguage, context)
       setTranslateResult(response.data)
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(formatApiError(err))
     } finally {
       setTranslateLoading(false)
@@ -158,7 +155,7 @@ export default function QuickAccessPage() {
     try {
       const response = await learningApi.define(text, context)
       setDefineResult(response.data)
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(formatApiError(err))
     } finally {
       setDefineLoading(false)
