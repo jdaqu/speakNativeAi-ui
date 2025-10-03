@@ -34,15 +34,23 @@ export async function getLatestReleaseDownloads(): Promise<DownloadUrls | null> 
     const release: GitHubRelease = await response.json()
     
     // Find the appropriate assets
+    console.log('Available assets:', release.assets.map(a => a.name))
+    
     const arm64Asset = release.assets.find(asset => 
       asset.name.includes('arm64') && asset.name.endsWith('.dmg')
     )
     
     const intelAsset = release.assets.find(asset => 
-      (asset.name.includes('x64') || asset.name.includes('intel')) && 
       asset.name.endsWith('.dmg') && 
       !asset.name.includes('arm64')
     )
+    
+    console.log('Found assets:', { 
+      arm64Asset: arm64Asset?.name, 
+      intelAsset: intelAsset?.name,
+      arm64Url: arm64Asset?.browser_download_url,
+      intelUrl: intelAsset?.browser_download_url
+    })
     
     if (!arm64Asset || !intelAsset) {
       console.warn('Could not find required assets in release:', release.assets)
