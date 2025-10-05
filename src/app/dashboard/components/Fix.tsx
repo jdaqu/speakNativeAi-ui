@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import { FormCard, SectionCard, ResultCard, GrammarErrorBadge, DifficultyBadge, FormalityBadge, Textarea } from '@/components/ui'
 import { BookOpen, Target, Lightbulb, MessageSquare } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { InlineContextHint } from './shared/InlineContextHint'
 import ExampleButtons from './shared/ExampleButtons'
 import { learningApi } from '@/lib/api'
@@ -47,6 +48,7 @@ interface FixResponse {
 }
 
 export default function Fix() {
+  const t = useTranslations('fix')
   const [phrase, setPhrase] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<FixResponse | null>(null)
@@ -55,16 +57,16 @@ export default function Fix() {
   // Example phrases with common English mistakes
   const examples = [
     {
-      text: "I goes to store yesterday and buy some foods",
-      description: "Subject-verb agreement and past tense errors"
+      text: t('examples.casual.text'),
+      description: t('examples.casual.description')
     },
     {
-      text: "She don't like to going to the gym",
-      description: "Auxiliary verb and gerund usage mistakes"
+      text: t('examples.formal.text'),
+      description: t('examples.formal.description')
     },
     {
-      text: "The informations are very important for me",
-      description: "Countable/uncountable noun errors"
+      text: t('examples.business.text'),
+      description: t('examples.business.description')
     }
   ]
 
@@ -109,11 +111,11 @@ export default function Fix() {
     <div className="space-y-8">
       {/* Input Section */}
       <FormCard
-        title="Enter Your Phrase"
-        description="Type any English sentence or phrase and get instant grammar corrections and improvements"
+        title={t('title')}
+        description={t('description')}
         primaryButton={{
-          label: 'Fix My English',
-          loadingLabel: 'Fixing...',
+          label: t('getCorrection'),
+          loadingLabel: t('gettingCorrection'),
           isLoading,
           isDisabled: !extractedText,
           form: 'fix-phrase-form',
@@ -135,7 +137,7 @@ export default function Fix() {
               id="phrase"
               value={phrase}
               onChange={(e) => setPhrase(e.target.value)}
-              placeholder="e.g., I goes to store yesterday and buy some foods"
+              placeholder={t('inputPlaceholder')}
               className="min-h-[100px] resize-vertical"
               disabled={isLoading}
             />
@@ -157,7 +159,7 @@ export default function Fix() {
         <div className="space-y-6">
           {/* Correction Result */}
           <ResultCard
-            title={result.is_correct ? 'Great! Your phrase is correct' : 'Here&apos;s the improved version'}
+            title={result.is_correct ? t('results.correct') : t('results.improved')}
             original={result.original_phrase}
             corrected={result.corrected_phrase}
             isCorrect={result.is_correct}
@@ -166,7 +168,7 @@ export default function Fix() {
           {/* Grammar Errors */}
           {result.grammar_errors.length > 0 && (
             <SectionCard
-              title={`Grammar Issues (${result.grammar_errors.length})`}
+              title={`${t('results.grammarIssues')} (${result.grammar_errors.length})`}
               icon={<Target className="h-5 w-5" />}
             >
               <div className="space-y-4">
@@ -181,11 +183,11 @@ export default function Fix() {
                     <p className="text-gray-700 mb-2">{error.explanation}</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                       <div>
-                        <p className="font-medium text-red-600">Incorrect:</p>
+                        <p className="font-medium text-red-600">{t('results.incorrect')}</p>
                         <p className="p-2 bg-red-50 rounded">{error.incorrect}</p>
                       </div>
                       <div>
-                        <p className="font-medium text-green-600">Correct:</p>
+                        <p className="font-medium text-green-600">{t('results.correct')}</p>
                         <p className="p-2 bg-green-50 rounded">{error.correct}</p>
                       </div>
                     </div>
@@ -198,7 +200,7 @@ export default function Fix() {
           {/* Context Analysis */}
           {result.context_analysis && (
             <SectionCard
-              title="Context Analysis"
+              title={t('results.contextAnalysis')}
               icon={<MessageSquare className="h-5 w-5" />}
             >
               <p className="text-gray-700">{result.context_analysis}</p>
@@ -208,12 +210,12 @@ export default function Fix() {
           {/* Alternative Expressions */}
           {result.alternative_expressions.length > 0 && (
             <SectionCard
-              title={`Alternative Ways to Express This (${result.alternative_expressions.length})`}
+              title={`${t('results.alternativeWays')} (${result.alternative_expressions.length})`}
               icon={<Lightbulb className="h-5 w-5" />}
               description={
                 result.is_correct
-                  ? "Your phrase is correct! Here are some alternative ways to express the same idea:"
-                  : "Here are some alternative ways to express your idea:"
+                  ? t('results.alternativeDescCorrect')
+                  : t('results.alternativeDescImprove')
               }
             >
               <div className="space-y-4">
@@ -227,11 +229,11 @@ export default function Fix() {
                     </div>
                     <div className="space-y-2 text-sm">
                       <div>
-                        <p className="font-medium text-gray-700">When to use:</p>
+                        <p className="font-medium text-gray-700">{t('results.whenToUse')}</p>
                         <p className="text-gray-600">{alternative.context_usage}</p>
                       </div>
                       <div>
-                        <p className="font-medium text-gray-700">Why this works:</p>
+                        <p className="font-medium text-gray-700">{t('results.whyWorks')}</p>
                         <p className="text-gray-600">{alternative.explanation}</p>
                       </div>
                     </div>
@@ -244,7 +246,7 @@ export default function Fix() {
           {/* Vocabulary Suggestions */}
           {result.vocabulary_suggestions.length > 0 && (
             <SectionCard
-              title={`Vocabulary Suggestions (${result.vocabulary_suggestions.length})`}
+              title={`${t('results.vocabularySuggestions')} (${result.vocabulary_suggestions.length})`}
               icon={<BookOpen className="h-5 w-5" />}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -255,11 +257,11 @@ export default function Fix() {
                   >
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-semibold text-lg">{vocab.word}</h4>
-                      <span className="text-sm text-gray-500">Alternative: {vocab.alternative}</span>
+                      <span className="text-sm text-gray-500">{t('results.alternative')} {vocab.alternative}</span>
                     </div>
                     <p className="text-gray-700 mb-2">{vocab.definition}</p>
                     <div className="text-sm">
-                      <p className="font-medium text-gray-600">Example:</p>
+                      <p className="font-medium text-gray-600">{t('results.example')}</p>
                       <p className="italic text-gray-600">{vocab.example}</p>
                     </div>
                   </div>
@@ -271,7 +273,7 @@ export default function Fix() {
           {/* Practice Topics */}
           {result.practice_topics.length > 0 && (
             <SectionCard
-              title={`Recommended Practice (${result.practice_topics.length})`}
+              title={`${t('results.recommendedPractice')} (${result.practice_topics.length})`}
               icon={<Target className="h-5 w-5" />}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

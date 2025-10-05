@@ -10,6 +10,7 @@ The frontend is a modern, responsive web application that serves as the user int
 -   **Language**: TypeScript
 -   **Styling**: Tailwind CSS with shadcn/ui components
 -   **Authentication**: Context-based JWT management
+-   **Internationalization**: next-intl (English & Spanish supported)
 
 ### Project Structure
 ```
@@ -17,6 +18,9 @@ frontend/
 ├── electron/                   # Electron-specific files
 │   ├── main.js                 # Main process (app lifecycle, windows, shortcuts)
 │   └── preload.js              # Secure IPC bridge between main and renderer
+├── messages/                   # i18n translation files
+│   ├── en.json                 # English translations
+│   └── es.json                 # Spanish translations
 ├── public/                     # Static assets
 ├── src/
 │   ├── app/                    # Next.js App Router pages
@@ -24,21 +28,56 @@ frontend/
 │   │   ├── quick-access/       # UI for the Electron quick-access popup
 │   │   ├── login/              # Login page
 │   │   ├── register/           # Registration page
-│   │   └── layout.tsx          # Root layout with AuthProvider
+│   │   └── layout.tsx          # Root layout with AuthProvider & LocaleProvider
 │   ├── components/
 │   │   └── ui/                 # Reusable shadcn/ui components
+│   ├── i18n/                   # Internationalization configuration
+│   │   ├── config.ts           # Locale settings
+│   │   └── request.ts          # Server-side i18n config
 │   └── lib/
 │       ├── auth-context.tsx    # Global authentication state management
+│       ├── locale-context.tsx  # Global locale state management
+│       ├── locale-storage.ts   # Cookie-based locale persistence
 │       ├── api.ts              # Centralized API client (Electron-aware)
 │       └── utils.ts            # Utility functions
+├── scripts/
+│   └── add-language.js         # Helper script to add new languages
 ├── package.json                # Dependencies and scripts
-└── next.config.ts              # Next.js configuration (Electron-aware)
+├── next.config.ts              # Next.js configuration (Electron-aware)
+├── I18N_GUIDE.md              # Complete i18n documentation
+├── I18N_QUICK_START.md        # Quick reference for i18n
+└── I18N_IMPLEMENTATION_SUMMARY.md  # Implementation details
 ```
 
 ### Core Components
 
 -   **API Client (`src/lib/api.ts`)**: A centralized Axios client for communicating with the backend. It is "Electron-aware," meaning it automatically switches the base URL from a relative path (`/api`) in the web app to a direct URL (`http://localhost:8000/api`) when running inside Electron.
 -   **Auth Context (`src/lib/auth-context.tsx`)**: A React Context that manages the user's authentication state, including the JWT token, user information, and loading status. It provides simple hooks for login, logout, and registration.
+-   **Locale Context (`src/lib/locale-context.tsx`)**: A React Context that manages the user's language preference. The selected language is persisted in cookies and automatically loads the appropriate translation file. Works seamlessly in both web and Electron modes.
+
+### Internationalization (i18n)
+
+The app supports multiple languages using **next-intl**:
+
+-   **Current Languages**: English (en), Spanish (es)
+-   **Persistence**: User's language choice is saved in a cookie (`NEXT_LOCALE`)
+-   **Switching**: Globe icon (🌍) in the header toggles between languages
+-   **Adding Languages**: Use `node scripts/add-language.js <code> <name>` (e.g., `node scripts/add-language.js fr Français`)
+
+**Documentation**:
+-   `I18N_GUIDE.md` - Complete guide with best practices
+-   `I18N_QUICK_START.md` - Quick reference for developers
+-   `I18N_IMPLEMENTATION_SUMMARY.md` - Implementation details and migration status
+
+**Usage in components**:
+```tsx
+import { useTranslations } from 'next-intl'
+
+function MyComponent() {
+  const t = useTranslations('auth.login')
+  return <h1>{t('title')}</h1>
+}
+```
 
 #### Inline Context Input (Fix / Translate / Define)
 

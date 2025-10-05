@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import { FormCard, SectionCard, PartOfSpeechBadge, Input } from '@/components/ui'
 import { Hash, Quote } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { InlineContextHint } from './shared/InlineContextHint'
 import ExampleButtons from './shared/ExampleButtons'
 import { learningApi } from '@/lib/api'
@@ -23,6 +24,7 @@ interface DefineResponse {
 }
 
 export default function Define() {
+  const t = useTranslations('define')
   const [word, setWord] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<DefineResponse | null>(null)
@@ -31,16 +33,16 @@ export default function Define() {
   // Example English words and phrases to define
   const examples = [
     {
-      text: "serendipity",
-      description: "Beautiful word for happy accidents"
+      text: t('examples.academic.text'),
+      description: t('examples.academic.description')
     },
     {
-      text: "procrastinate",
-      description: "Common verb many students know"
+      text: t('examples.business.text'),
+      description: t('examples.business.description')
     },
     {
-      text: "break the ice",
-      description: "Common English idiom"
+      text: t('examples.casual.text'),
+      description: t('examples.casual.description')
     }
   ]
 
@@ -100,11 +102,11 @@ export default function Define() {
     <div className="space-y-8">
       {/* Input Section */}
       <FormCard
-        title="Look Up a Word"
-        description="Get detailed definitions, examples, and synonyms for any English word"
+        title={t('title')}
+        description={t('description')}
         primaryButton={{
-          label: 'Define Word',
-          loadingLabel: 'Looking up...',
+          label: t('getDefinition'),
+          loadingLabel: t('gettingDefinition'),
           isLoading,
           isDisabled: !extractedText,
           form: 'define-word-form',
@@ -120,12 +122,12 @@ export default function Define() {
         <form id="define-word-form" onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Word to define
+              {t('title')}
             </label>
             <Input
               value={word}
               onChange={(e) => setWord(e.target.value)}
-              placeholder="e.g., serendipity, enigmatic, procrastinate"
+              placeholder={t('inputPlaceholder')}
               disabled={isLoading}
             />
           </div>
@@ -161,7 +163,7 @@ export default function Define() {
           {/* Definitions */}
           {result.definitions.length > 0 && (
             <SectionCard
-              title={`Definitions (${result.definitions.length})`}
+              title={t('definition')}
               icon={<Hash className="h-5 w-5" />}
             >
               <div className="space-y-6">

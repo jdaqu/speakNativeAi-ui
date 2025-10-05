@@ -1,0 +1,289 @@
+{
+  "common": {
+    "appName": "SpeakNative AI",
+    "loading": "Cargando...",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "username": "Nombre de usuario",
+    "logout": "Cerrar sesión",
+    "backToHome": "Volver al inicio",
+    "welcome": "Bienvenido",
+    "tryExamples": "Prueba estos ejemplos:"
+  },
+  "landing": {
+    "header": {
+      "login": "Iniciar sesión",
+      "getStarted": "Comenzar"
+    },
+    "hero": {
+      "badge": "Aprendizaje de Inglés con IA",
+      "title": "Aprende inglés desde",
+      "titleHighlight": "Tus Propios Errores",
+      "subtitle": "Deja de perder tiempo con prompts de ChatGPT. Obtén correcciones instantáneas en ≤30 segundos mientras construyes automáticamente una ruta de aprendizaje personalizada desde tus propios patrones de escritura y errores.",
+      "ctaFree": "Empezar Gratis",
+      "ctaSignIn": "Iniciar Sesión"
+    },
+    "desktopBadge": {
+      "title": "También Disponible como App de Escritorio",
+      "description": "Acceso instantáneo con atajo global (Cmd+Shift+S)",
+      "download": "Descargar para Mac"
+    },
+    "problem": {
+      "badge": "El Problema Actual",
+      "title": "¿Cansado del Baile de ChatGPT?",
+      "point1": "Abrir ChatGPT → Escribir prompt → Pegar texto → Esperar → Copiar resultado",
+      "point2": "Las correcciones desaparecen después de usarlas - no hay aprendizaje",
+      "point3": "Los ejemplos genéricos no coinciden con tus patrones reales de escritura"
+    },
+    "solution": {
+      "badge": "Nuestra Solución",
+      "title": "Correcciones con Un Clic + Aprendizaje Automático",
+      "point1": "Correcciones instantáneas en ≤30 segundos con atajo global",
+      "point2": "Cada error guardado y rastreado automáticamente",
+      "point3": "Práctica personalizada desde tus patrones reales de escritura"
+    },
+    "features": {
+      "title": "Convierte Tu Escritura en Aprendizaje",
+      "subtitle": "Cada corrección, traducción y consulta de vocabulario construye automáticamente tu ruta de aprendizaje personalizada",
+      "fix": {
+        "title": "Corrección + Seguimiento Instantáneo",
+        "description": "Obtén correcciones en ≤30 segundos mientras cada error se guarda automáticamente para tu ruta de aprendizaje",
+        "point1": "Correcciones gramaticales con un clic",
+        "point2": "Errores rastreados automáticamente",
+        "point3": "Práctica personalizada generada"
+      },
+      "translate": {
+        "title": "Traducción Inteligente",
+        "description": "Traducciones conscientes del contexto que aprenden de tus patrones y necesidades lingüísticas específicas",
+        "point1": "Traducciones conscientes del contexto",
+        "point2": "Tus patrones de vocabulario rastreados",
+        "point3": "Sugerencias de palabras personalizadas"
+      },
+      "learn": {
+        "title": "Ruta de Aprendizaje Personal",
+        "description": "Materiales de estudio generados automáticamente basados en tus errores y patrones reales de escritura",
+        "point1": "Práctica desde tus propios errores",
+        "point2": "Vocabulario que realmente usas",
+        "point3": "Patrones gramaticales con los que luchas"
+      }
+    },
+    "workflow": {
+      "title": "Cómo Funciona en 30 Segundos",
+      "subtitle": "Mira lo fácil que es obtener correcciones mientras construyes tu ruta de aprendizaje",
+      "step1": {
+        "title": "Presiona Cmd+Shift+S",
+        "description": "El atajo global abre la app instantáneamente, desde cualquier lugar de tu computadora"
+      },
+      "step2": {
+        "title": "Pega Tu Texto",
+        "description": "Obtén correcciones instantáneas, traducciones o ayuda de vocabulario en segundos"
+      },
+      "step3": {
+        "title": "Aprende Automáticamente",
+        "description": "Cada interacción construye tu ruta de aprendizaje personalizada y materiales de práctica"
+      },
+      "video": {
+        "title": "Míralo en Acción",
+        "subtitle": "Mira lo fácil que es obtener correcciones mientras construyes tu ruta de aprendizaje",
+        "placeholder": "Video Demo Próximamente",
+        "placeholderSubtitle": "Mira el flujo de trabajo de 30 segundos en acción",
+        "playDemo": "Reproducir Demo",
+        "description": "Lo que verás: Corrección en tiempo real de un correo electrónico, seguimiento automático de errores y generación de práctica personalizada - todo en menos de 30 segundos."
+      }
+    },
+    "download": {
+      "title": "Obtén la",
+      "titleHighlight": "App de Escritorio",
+      "subtitle": "Accede a SpeakNative AI instantáneamente desde cualquier lugar con nuestra app de escritorio.",
+      "subtitleExtra": "Usa el atajo global (Cmd+Shift+S / Ctrl+Shift+S) para correcciones y traducciones rápidas.",
+      "macAppleSilicon": "Mac (Apple Silicon)",
+      "macIntel": "Mac (Intel)",
+      "comingSoon": "Próximamente",
+      "loading": "Cargando...",
+      "macVersion": "macOS 10.13+",
+      "windowsVersion": "Windows 10+",
+      "linuxVersion": "Ubuntu, Debian, Fedora",
+      "features": {
+        "title": "Características de la App de Escritorio",
+        "globalHotkey": "Acceso con atajo global (Cmd+Shift+S)",
+        "quickPopup": "Popup rápido de Corregir, Traducir y Definir",
+        "offline": "Funciona sin conexión para contenido en caché",
+        "systemTray": "Integración con la bandeja del sistema",
+        "autoUpdates": "Actualizaciones automáticas para las últimas características",
+        "nativeIntegration": "Integración nativa con el SO"
+      }
+    },
+    "testimonials": {
+      "title": "Amado por Estudiantes de Inglés en Todo el Mundo",
+      "subtitle": "Mira lo que nuestros usuarios dicen sobre su experiencia de aprendizaje",
+      "user1": {
+        "name": "Maria Santos",
+        "role": "Ingeniera de Software, Brasil",
+        "quote": "¡Finalmente puedo corregir mis correos sin el lío de ChatGPT! La app rastrea mis errores y crea ejercicios de práctica desde mis patrones reales de escritura. Cambió todo para el trabajo."
+      },
+      "user2": {
+        "name": "Ahmed Hassan",
+        "role": "Estudiante, Egipto",
+        "quote": "Como estudiante de doctorado, escribo constantemente en inglés. La app de escritorio con Cmd+Shift+S me ahorra horas cada semana. ¡Además, ahora realmente estoy aprendiendo de mis errores!"
+      },
+      "user3": {
+        "name": "Yuki Tanaka",
+        "role": "Gerente de Marketing, Japón",
+        "quote": "Trabajo en una empresa global y necesito comunicarme profesionalmente. SpeakNative AI aprende mi estilo de comunicación y me ayuda a sonar más natural. ¡El aprendizaje personalizado es brillante!"
+      }
+    },
+    "cta": {
+      "title": "Deja el Baile de ChatGPT",
+      "subtitle": "Únete a profesionales y estudiantes que están aprendiendo de sus propios errores mientras obtienen correcciones instantáneas",
+      "startJourney": "Comienza Tu Viaje",
+      "signIn": "Iniciar Sesión",
+      "stat1": "≤30s",
+      "stat1Label": "Tiempo Promedio de Corrección",
+      "stat2": "100%",
+      "stat2Label": "Errores Rastreados Automáticamente",
+      "stat3": "∞",
+      "stat3Label": "Rutas de Aprendizaje Personalizadas"
+    },
+    "footer": {
+      "copyright": "© 2025 SpeakNative AI. Todos los derechos reservados."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Bienvenido de nuevo",
+      "subtitle": "Inicia sesión para continuar tu viaje de aprendizaje de inglés",
+      "signIn": "Iniciar sesión",
+      "signingIn": "Iniciando sesión...",
+      "enterCredentials": "Ingresa tu correo electrónico y contraseña para acceder a tu cuenta",
+      "noAccount": "¿No tienes una cuenta?",
+      "signUpHere": "Regístrate aquí",
+      "passwordTooLong": "La contraseña no puede exceder 72 caracteres"
+    },
+    "register": {
+      "title": "Crea tu cuenta",
+      "subtitle": "Comienza tu viaje hacia un mejor inglés",
+      "signUp": "Registrarse",
+      "signingUp": "Registrando...",
+      "enterDetails": "Ingresa tus datos para crear tu cuenta",
+      "hasAccount": "¿Ya tienes una cuenta?",
+      "signInHere": "Inicia sesión aquí",
+      "passwordRequirements": "La contraseña debe tener al menos 8 caracteres",
+      "confirmPassword": "Confirmar contraseña",
+      "passwordsMustMatch": "Las contraseñas deben coincidir"
+    }
+  },
+  "dashboard": {
+    "title": "Panel",
+    "loadingDashboard": "Cargando panel...",
+    "authenticating": "Autenticando...",
+    "notAuthenticated": "No autenticado, redirigiendo...",
+    "welcomeUser": "¡Bienvenido, {username}!",
+    "tabs": {
+      "fix": "Corregir mi inglés",
+      "translate": "Traductor inteligente",
+      "define": "Definiciones de palabras"
+    }
+  },
+  "fix": {
+    "title": "Corregir mi inglés",
+    "description": "Obtén correcciones y sugerencias con IA para tu texto en inglés",
+    "inputPlaceholder": "Escribe o pega tu texto en inglés aquí... (ej., \"I goes to store yesterday\")",
+    "contextPlaceholder": "Añade contexto (ej., \"charla casual con compañeros\", \"correo de negocios\")...",
+    "addContext": "Añadir contexto",
+    "hideContext": "Ocultar contexto",
+    "getCorrection": "Obtener corrección",
+    "gettingCorrection": "Obteniendo corrección...",
+    "correctedVersion": "Versión corregida:",
+    "explanation": "Explicación:",
+    "contextDetected": "Contexto: {context}",
+    "results": {
+      "correct": "¡Excelente! Tu frase es correcta",
+      "improved": "Aquí está la versión mejorada",
+      "grammarIssues": "Problemas Gramaticales",
+      "incorrect": "Incorrecto:",
+      "correct": "Correcto:",
+      "contextAnalysis": "Análisis de Contexto",
+      "alternativeWays": "Formas Alternativas de Expresar Esto",
+      "alternativeDescCorrect": "¡Tu frase es correcta! Aquí hay algunas formas alternativas de expresar la misma idea:",
+      "alternativeDescImprove": "Aquí hay algunas formas alternativas de expresar tu idea:",
+      "whenToUse": "Cuándo usar:",
+      "whyWorks": "Por qué funciona:",
+      "vocabularySuggestions": "Sugerencias de Vocabulario",
+      "alternative": "Alternativa:",
+      "example": "Ejemplo:",
+      "recommendedPractice": "Práctica Recomendada"
+    },
+    "examples": {
+      "casual": {
+        "text": "I goes to store yesterday",
+        "description": "Ejemplo de conversación casual"
+      },
+      "formal": {
+        "text": "I didn't went to the meeting",
+        "description": "Ejemplo de contexto formal"
+      },
+      "business": {
+        "text": "Please to help me with this",
+        "description": "Ejemplo de comunicación empresarial"
+      }
+    }
+  },
+  "translate": {
+    "title": "Traductor inteligente",
+    "description": "Traducción consciente del contexto que se adapta a tu situación",
+    "inputPlaceholder": "Escribe o pega texto en cualquier idioma... (ej., \"Necesito una reunión\")",
+    "contextPlaceholder": "Añade contexto (ej., \"reunión de negocios\", \"conversación casual\")...",
+    "addContext": "Añadir contexto",
+    "hideContext": "Ocultar contexto",
+    "getTranslation": "Obtener traducción",
+    "gettingTranslation": "Obteniendo traducción...",
+    "translation": "Traducción:",
+    "contextDetected": "Contexto: {context}",
+    "examples": {
+      "meeting": {
+        "text": "Necesito una reunión",
+        "description": "Traducción de contexto empresarial"
+      },
+      "casual": {
+        "text": "¿Qué tal?",
+        "description": "Traducción de saludo casual"
+      },
+      "formal": {
+        "text": "Me gustaría solicitar información",
+        "description": "Traducción de solicitud formal"
+      }
+    }
+  },
+  "define": {
+    "title": "Definiciones de palabras",
+    "description": "Obtén definiciones contextuales y ejemplos de uso para palabras en inglés",
+    "inputPlaceholder": "Ingresa una palabra o frase... (ej., \"serendipity\")",
+    "contextPlaceholder": "Añade contexto (ej., \"clase de literatura\", \"conversación casual\")...",
+    "addContext": "Añadir contexto",
+    "hideContext": "Ocultar contexto",
+    "getDefinition": "Obtener definición",
+    "gettingDefinition": "Obteniendo definición...",
+    "definition": "Definición:",
+    "contextDetected": "Contexto: {context}",
+    "examples": {
+      "academic": {
+        "text": "serendipity",
+        "description": "Definición de palabra académica"
+      },
+      "business": {
+        "text": "leverage",
+        "description": "Definición de término empresarial"
+      },
+      "casual": {
+        "text": "hang out",
+        "description": "Definición de frase casual"
+      }
+    }
+  },
+  "errors": {
+    "general": "Ocurrió un error. Por favor, inténtalo de nuevo.",
+    "network": "Error de red. Por favor, verifica tu conexión.",
+    "unauthorized": "Por favor, inicia sesión para continuar.",
+    "required": "Este campo es obligatorio."
+  }
+}
