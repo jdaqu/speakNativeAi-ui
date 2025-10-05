@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import { Textarea, FormCard, SectionCard, FormalityBadge } from '@/components/ui'
 import { Languages } from 'lucide-react'
 import { InlineContextHint } from './shared/InlineContextHint'
+import ExampleButtons from './shared/ExampleButtons'
 import { learningApi } from '@/lib/api'
 import { formatApiError, extractInlineContext } from '@/lib/utils'
 
@@ -25,6 +26,18 @@ export default function Translate() {
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<TranslateResponse | null>(null)
   const [error, setError] = useState('')
+
+  // Example Spanish phrases to translate to English
+  const examples = [
+    {
+      text: "Necesito enviar este correo a mi jefe mañana",
+      description: "Professional email context"
+    },
+    {
+      text: "Me gustaría agendar una reunión para la próxima semana",
+      description: "Business scheduling"
+    }
+  ]
 
   // Cache inline context extraction to avoid recalculation
   const { text: extractedText, context: extractedContext } = useMemo(
@@ -60,6 +73,12 @@ export default function Translate() {
 
   const handleReset = () => {
     setText('')
+    setResult(null)
+    setError('')
+  }
+
+  const handleExampleClick = (exampleText: string) => {
+    setText(exampleText)
     setResult(null)
     setError('')
   }
@@ -112,6 +131,13 @@ export default function Translate() {
           {/* Inline context hint */}
           <InlineContextHint context={extractedContext} />
         </form>
+
+        {/* Example buttons */}
+        <ExampleButtons 
+          examples={examples}
+          onExampleClick={handleExampleClick}
+          disabled={isLoading}
+        />
       </FormCard>
 
       {/* Results Section */}

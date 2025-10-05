@@ -66,8 +66,8 @@ export default function DashboardPage() {
     )
   }
 
-  const handleLogout = () => {
-    logout()
+  const handleLogout = async () => {
+    await logout()
     navigation.goto('/')
   }
 
