@@ -30,15 +30,17 @@ export default function ExampleButtons({ examples, onExampleClick, disabled = fa
       </div>
       <div className="flex flex-wrap gap-2">
         {examples.map((example, index) => (
-          <button
+          <Button
             key={index}
             onClick={() => onExampleClick(example.text)}
             disabled={disabled}
-            className={`px-3 py-1.5 text-xs rounded-full border transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-sm hover:shadow-md ${colorVariants[index % colorVariants.length]}`}
+            variant="outline"
+            size="sm"
+            className={`text-xs rounded-full transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:transform-none shadow-sm hover:shadow-md ${colorVariants[index % colorVariants.length]}`}
             title={example.description}
           >
             <span className="font-medium">"{example.text}"</span>
-          </button>
+          </Button>
         ))}
       </div>
     </div>
