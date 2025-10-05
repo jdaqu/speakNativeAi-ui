@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import { FormCard, SectionCard, PartOfSpeechBadge, Input } from '@/components/ui'
 import { Hash, Quote } from 'lucide-react'
 import { InlineContextHint } from './shared/InlineContextHint'
+import ExampleButtons from './shared/ExampleButtons'
 import { learningApi } from '@/lib/api'
 import { formatApiError, extractInlineContext } from '@/lib/utils'
 
@@ -26,6 +27,22 @@ export default function Define() {
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<DefineResponse | null>(null)
   const [error, setError] = useState('')
+
+  // Example English words and phrases to define
+  const examples = [
+    {
+      text: "serendipity",
+      description: "Beautiful word for happy accidents"
+    },
+    {
+      text: "procrastinate",
+      description: "Common verb many students know"
+    },
+    {
+      text: "break the ice",
+      description: "Common English idiom"
+    }
+  ]
 
   // Cache inline context extraction to avoid recalculation
   const { text: extractedText, context: extractedContext } = useMemo(
@@ -53,6 +70,12 @@ export default function Define() {
 
   const handleReset = () => {
     setWord('')
+    setResult(null)
+    setError('')
+  }
+
+  const handleExampleClick = (exampleText: string) => {
+    setWord(exampleText)
     setResult(null)
     setError('')
   }
@@ -110,6 +133,13 @@ export default function Define() {
           {/* Inline context hint */}
           <InlineContextHint context={extractedContext} />
         </form>
+
+        {/* Example buttons */}
+        <ExampleButtons 
+          examples={examples}
+          onExampleClick={handleExampleClick}
+          disabled={isLoading}
+        />
       </FormCard>
 
       {/* Results Section */}

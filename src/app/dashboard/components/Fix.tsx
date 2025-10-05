@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import { FormCard, SectionCard, ResultCard, GrammarErrorBadge, DifficultyBadge, FormalityBadge, Textarea } from '@/components/ui'
 import { BookOpen, Target, Lightbulb, MessageSquare } from 'lucide-react'
 import { InlineContextHint } from './shared/InlineContextHint'
+import ExampleButtons from './shared/ExampleButtons'
 import { learningApi } from '@/lib/api'
 import { formatApiError, extractInlineContext } from '@/lib/utils'
 
@@ -51,6 +52,22 @@ export default function Fix() {
   const [result, setResult] = useState<FixResponse | null>(null)
   const [error, setError] = useState('')
 
+  // Example phrases with common English mistakes
+  const examples = [
+    {
+      text: "I goes to store yesterday and buy some foods",
+      description: "Subject-verb agreement and past tense errors"
+    },
+    {
+      text: "She don't like to going to the gym",
+      description: "Auxiliary verb and gerund usage mistakes"
+    },
+    {
+      text: "The informations are very important for me",
+      description: "Countable/uncountable noun errors"
+    }
+  ]
+
   // Cache inline context extraction to avoid recalculation
   const { text: extractedText, context: extractedContext } = useMemo(
     () => extractInlineContext(phrase.trim()),
@@ -77,6 +94,12 @@ export default function Fix() {
 
   const handleReset = () => {
     setPhrase('')
+    setResult(null)
+    setError('')
+  }
+
+  const handleExampleClick = (exampleText: string) => {
+    setPhrase(exampleText)
     setResult(null)
     setError('')
   }
@@ -120,6 +143,13 @@ export default function Fix() {
           {/* Inline context hint */}
           <InlineContextHint context={extractedContext} />
         </form>
+
+        {/* Example buttons */}
+        <ExampleButtons 
+          examples={examples}
+          onExampleClick={handleExampleClick}
+          disabled={isLoading}
+        />
       </FormCard>
 
       {/* Results Section */}
