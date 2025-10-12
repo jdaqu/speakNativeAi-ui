@@ -1,0 +1,289 @@
+{
+  "common": {
+    "appName": "SpeakNative AI",
+    "loading": "Loading...",
+    "email": "Email",
+    "password": "Password",
+    "username": "Username",
+    "logout": "Logout",
+    "backToHome": "Back to home",
+    "welcome": "Welcome",
+    "tryExamples": "Try these examples:"
+  },
+  "landing": {
+    "header": {
+      "login": "Login",
+      "getStarted": "Get Started"
+    },
+    "hero": {
+      "badge": "AI-Powered English Learning",
+      "title": "Learn English from",
+      "titleHighlight": "Your Own Mistakes",
+      "subtitle": "Stop wasting time with ChatGPT prompts. Get instant corrections in ≤30 seconds while automatically building a personalized learning path from your real writing patterns and mistakes.",
+      "ctaFree": "Start Learning Free",
+      "ctaSignIn": "Sign In"
+    },
+    "desktopBadge": {
+      "title": "Also Available as Desktop App",
+      "description": "Get instant access with global hotkey (Cmd+Shift+S)",
+      "download": "Download for Mac"
+    },
+    "problem": {
+      "badge": "The Current Problem",
+      "title": "Tired of the ChatGPT Dance?",
+      "point1": "Open ChatGPT → Write prompt → Paste text → Wait → Copy result",
+      "point2": "Corrections disappear after use - no learning happens",
+      "point3": "Generic examples don't match your real writing patterns"
+    },
+    "solution": {
+      "badge": "Our Solution",
+      "title": "One-Click Corrections + Automatic Learning",
+      "point1": "Instant corrections in ≤30 seconds with global hotkey",
+      "point2": "Every mistake automatically saved and tracked",
+      "point3": "Personalized practice from your actual writing patterns"
+    },
+    "features": {
+      "title": "Turn Your Writing Into Learning",
+      "subtitle": "Every correction, translation, and vocabulary lookup automatically builds your personalized learning path",
+      "fix": {
+        "title": "Instant Fix + Track",
+        "description": "Get corrections in ≤30 seconds while every mistake is automatically saved for your learning path",
+        "point1": "One-click grammar corrections",
+        "point2": "Mistakes automatically tracked",
+        "point3": "Personalized practice generated"
+      },
+      "translate": {
+        "title": "Smart Translation",
+        "description": "Context-aware translations that learn from your specific language patterns and needs",
+        "point1": "Context-aware translations",
+        "point2": "Your vocabulary patterns tracked",
+        "point3": "Personalized word suggestions"
+      },
+      "learn": {
+        "title": "Personal Learning Path",
+        "description": "Automatically generated study materials based on your real writing mistakes and patterns",
+        "point1": "Practice from your own mistakes",
+        "point2": "Vocabulary you actually use",
+        "point3": "Grammar patterns you struggle with"
+      }
+    },
+    "workflow": {
+      "title": "How It Works in 30 Seconds",
+      "subtitle": "See how easy it is to get corrections while building your learning path",
+      "step1": {
+        "title": "Press Cmd+Shift+S",
+        "description": "Global hotkey opens the app instantly, anywhere on your computer"
+      },
+      "step2": {
+        "title": "Paste Your Text",
+        "description": "Get instant corrections, translations, or vocabulary help in seconds"
+      },
+      "step3": {
+        "title": "Learn Automatically",
+        "description": "Every interaction builds your personalized learning path and practice materials"
+      },
+      "video": {
+        "title": "See It In Action",
+        "subtitle": "Watch how easy it is to get corrections while building your learning path",
+        "placeholder": "Demo Video Coming Soon",
+        "placeholderSubtitle": "Watch the 30-second workflow in action",
+        "playDemo": "Play Demo",
+        "description": "What you'll see: Real-time correction of an email, automatic mistake tracking, and personalized practice generation - all in under 30 seconds."
+      }
+    },
+    "download": {
+      "title": "Get the",
+      "titleHighlight": "Desktop App",
+      "subtitle": "Access SpeakNative AI instantly from anywhere with our desktop app.",
+      "subtitleExtra": "Use the global shortcut (Cmd+Shift+S / Ctrl+Shift+S) for quick corrections and translations.",
+      "macAppleSilicon": "Mac (Apple Silicon)",
+      "macIntel": "Mac (Intel)",
+      "comingSoon": "Coming Soon",
+      "loading": "Loading...",
+      "macVersion": "macOS 10.13+",
+      "windowsVersion": "Windows 10+",
+      "linuxVersion": "Ubuntu, Debian, Fedora",
+      "features": {
+        "title": "Desktop App Features",
+        "globalHotkey": "Global hotkey access (Cmd+Shift+S)",
+        "quickPopup": "Quick Fix, Translate & Define popup",
+        "offline": "Works offline for cached content",
+        "systemTray": "System tray integration",
+        "autoUpdates": "Auto-updates for latest features",
+        "nativeIntegration": "Native OS integration"
+      }
+    },
+    "testimonials": {
+      "title": "Loved by English Learners Worldwide",
+      "subtitle": "See what our users are saying about their learning experience",
+      "user1": {
+        "name": "Maria Santos",
+        "role": "Software Engineer, Brazil",
+        "quote": "Finally, I can fix my emails without the ChatGPT hassle! The app tracks my mistakes and creates practice exercises from my actual writing patterns. Game changer for work."
+      },
+      "user2": {
+        "name": "Ahmed Hassan",
+        "role": "Student, Egypt",
+        "quote": "As a PhD student, I write constantly in English. The desktop app with Cmd+Shift+S saves me hours every week. Plus, I'm actually learning from my mistakes now!"
+      },
+      "user3": {
+        "name": "Yuki Tanaka",
+        "role": "Marketing Manager, Japan",
+        "quote": "I work in a global company and need to communicate professionally. SpeakNative AI learns my communication style and helps me sound more natural. The personalized learning is brilliant!"
+      }
+    },
+    "cta": {
+      "title": "Stop the ChatGPT Dance",
+      "subtitle": "Join professionals and students who are learning from their own mistakes while getting instant corrections",
+      "startJourney": "Start Your Journey",
+      "signIn": "Sign In",
+      "stat1": "≤30s",
+      "stat1Label": "Average Correction Time",
+      "stat2": "100%",
+      "stat2Label": "Mistakes Automatically Tracked",
+      "stat3": "∞",
+      "stat3Label": "Personalized Learning Paths"
+    },
+    "footer": {
+      "copyright": "© 2025 SpeakNative AI. All rights reserved."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to continue your English learning journey",
+      "signIn": "Sign In",
+      "signingIn": "Signing in...",
+      "enterCredentials": "Enter your email and password to access your account",
+      "noAccount": "Don't have an account?",
+      "signUpHere": "Sign up here",
+      "passwordTooLong": "Password cannot exceed 72 characters"
+    },
+    "register": {
+      "title": "Create your account",
+      "subtitle": "Start your journey to better English",
+      "signUp": "Sign Up",
+      "signingUp": "Signing up...",
+      "enterDetails": "Enter your details to create your account",
+      "hasAccount": "Already have an account?",
+      "signInHere": "Sign in here",
+      "passwordRequirements": "Password must be at least 8 characters",
+      "confirmPassword": "Confirm Password",
+      "passwordsMustMatch": "Passwords must match"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "loadingDashboard": "Loading dashboard...",
+    "authenticating": "Authenticating...",
+    "notAuthenticated": "Not authenticated, redirecting...",
+    "welcomeUser": "Welcome, {username}!",
+    "tabs": {
+      "fix": "Fix My English",
+      "translate": "Smart Translator",
+      "define": "Word Definitions"
+    }
+  },
+  "fix": {
+    "title": "Fix My English",
+    "description": "Get AI-powered corrections and suggestions for your English text",
+    "inputPlaceholder": "Type or paste your English text here... (e.g., \"I goes to store yesterday\")",
+    "contextPlaceholder": "Add context (e.g., \"casual chat with coworkers\", \"business email\")...",
+    "addContext": "Add context",
+    "hideContext": "Hide context",
+    "getCorrection": "Get Correction",
+    "gettingCorrection": "Getting correction...",
+    "correctedVersion": "Corrected Version:",
+    "explanation": "Explanation:",
+    "contextDetected": "Context: {context}",
+    "results": {
+      "correct": "Great! Your phrase is correct",
+      "improved": "Here's the improved version",
+      "grammarIssues": "Grammar Issues",
+      "incorrect": "Incorrect:",
+      "correct": "Correct:",
+      "contextAnalysis": "Context Analysis",
+      "alternativeWays": "Alternative Ways to Express This",
+      "alternativeDescCorrect": "Your phrase is correct! Here are some alternative ways to express the same idea:",
+      "alternativeDescImprove": "Here are some alternative ways to express your idea:",
+      "whenToUse": "When to use:",
+      "whyWorks": "Why this works:",
+      "vocabularySuggestions": "Vocabulary Suggestions",
+      "alternative": "Alternative:",
+      "example": "Example:",
+      "recommendedPractice": "Recommended Practice"
+    },
+    "examples": {
+      "casual": {
+        "text": "I goes to store yesterday",
+        "description": "Casual conversation example"
+      },
+      "formal": {
+        "text": "I didn't went to the meeting",
+        "description": "Formal context example"
+      },
+      "business": {
+        "text": "Please to help me with this",
+        "description": "Business communication example"
+      }
+    }
+  },
+  "translate": {
+    "title": "Smart Translator",
+    "description": "Context-aware translation that adapts to your situation",
+    "inputPlaceholder": "Type or paste text in any language... (e.g., \"Necesito una reunión\")",
+    "contextPlaceholder": "Add context (e.g., \"business meeting\", \"casual conversation\")...",
+    "addContext": "Add context",
+    "hideContext": "Hide context",
+    "getTranslation": "Get Translation",
+    "gettingTranslation": "Getting translation...",
+    "translation": "Translation:",
+    "contextDetected": "Context: {context}",
+    "examples": {
+      "meeting": {
+        "text": "Necesito una reunión",
+        "description": "Business context translation"
+      },
+      "casual": {
+        "text": "¿Qué tal?",
+        "description": "Casual greeting translation"
+      },
+      "formal": {
+        "text": "Me gustaría solicitar información",
+        "description": "Formal request translation"
+      }
+    }
+  },
+  "define": {
+    "title": "Word Definitions",
+    "description": "Get contextual definitions and usage examples for English words",
+    "inputPlaceholder": "Enter a word or phrase... (e.g., \"serendipity\")",
+    "contextPlaceholder": "Add context (e.g., \"literature class\", \"casual conversation\")...",
+    "addContext": "Add context",
+    "hideContext": "Hide context",
+    "getDefinition": "Get Definition",
+    "gettingDefinition": "Getting definition...",
+    "definition": "Definition:",
+    "contextDetected": "Context: {context}",
+    "examples": {
+      "academic": {
+        "text": "serendipity",
+        "description": "Academic word definition"
+      },
+      "business": {
+        "text": "leverage",
+        "description": "Business term definition"
+      },
+      "casual": {
+        "text": "hang out",
+        "description": "Casual phrase definition"
+      }
+    }
+  },
+  "errors": {
+    "general": "An error occurred. Please try again.",
+    "network": "Network error. Please check your connection.",
+    "unauthorized": "Please log in to continue.",
+    "required": "This field is required."
+  }
+}

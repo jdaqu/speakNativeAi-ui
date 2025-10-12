@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui'
+import { useTranslations } from 'next-intl'
 import { Lightbulb } from 'lucide-react'
 
 interface Example {
@@ -15,6 +16,8 @@ interface ExampleButtonsProps {
 }
 
 export default function ExampleButtons({ examples, onExampleClick, disabled = false }: ExampleButtonsProps) {
+  const t = useTranslations()
+
   // Color variants using project's blue theme
   const colorVariants = [
     'bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 text-blue-700 hover:text-blue-800 border-blue-200 hover:border-blue-300',
@@ -26,7 +29,7 @@ export default function ExampleButtons({ examples, onExampleClick, disabled = fa
     <div className="space-y-3 pt-2">
       <div className="flex items-center space-x-2 text-xs text-gray-600">
         <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-        <span className="font-medium">Try these examples:</span>
+        <span className="font-medium">{t('common.tryExamples')}</span>
       </div>
       <div className="flex flex-wrap gap-2">
         {examples.map((example, index) => (

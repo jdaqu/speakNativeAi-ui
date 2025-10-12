@@ -3,12 +3,14 @@
 import { useAuth } from '@/lib/auth-context'
 import { navigation } from '@/lib/navigation'
 import { useEffect, useState } from 'react'
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input } from '@/components/ui'
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, LanguageSwitcher } from '@/components/ui'
 import { BookOpen, MessageCircle, Globe, Brain, Download, Monitor, Eye, EyeOff } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { formatApiError } from '@/lib/utils'
 import { getDownloadUrls, DownloadUrls } from '@/lib/github-releases'
 
 export default function HomePage() {
+  const t = useTranslations()
   const { isAuthenticated, isLoading, login } = useAuth()
 
   // Track if component has mounted to prevent SSR/hydration issues
@@ -183,18 +185,19 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm">
+      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <Brain className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold text-gray-900">SpeakNative AI</span>
+            <span className="text-2xl font-bold text-gray-900">{t('common.appName')}</span>
           </div>
-          <div className="space-x-4">
+          <div className="flex items-center space-x-4">
+            <LanguageSwitcher />
             <Button variant="ghost" asChild>
-              <a href={navigation.getHref('/login')}>Login</a>
+              <a href={navigation.getHref('/login')}>{t('landing.header.login')}</a>
             </Button>
             <Button asChild>
-              <a href={navigation.getHref('/register')}>Get Started</a>
+              <a href={navigation.getHref('/register')}>{t('landing.header.getStarted')}</a>
             </Button>
           </div>
         </div>
@@ -213,30 +216,29 @@ export default function HomePage() {
           {/* Badge */}
           <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-100 text-blue-800 text-sm font-medium mb-8 animate-fade-in">
             <Brain className="h-4 w-4 mr-2" />
-            AI-Powered English Learning
+            {t('landing.hero.badge')}
           </div>
-          
+
           <h1 className="text-6xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight animate-slide-up">
-            Learn English from{' '}
+            {t('landing.hero.title')}{' '}
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Your Own Mistakes
+              {t('landing.hero.titleHighlight')}
             </span>
           </h1>
-          
+
           <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed animate-slide-up" style={{animationDelay: '0.2s'}}>
-            Stop wasting time with ChatGPT prompts. Get instant corrections in ≤30 seconds while automatically 
-            building a personalized learning path from your real writing patterns and mistakes.
+            {t('landing.hero.subtitle')}
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-up" style={{animationDelay: '0.4s'}}>
             <Button size="lg" className="text-lg px-8 py-4 h-auto shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" asChild>
               <a href={navigation.getHref('/register')}>
-                Start Learning Free
+                {t('landing.hero.ctaFree')}
                 <span className="ml-2">→</span>
               </a>
             </Button>
             <Button variant="outline" size="lg" className="text-lg px-8 py-4 h-auto border-2 hover:bg-gray-50 transition-all duration-300" asChild>
-              <a href={navigation.getHref('/login')}>Sign In</a>
+              <a href={navigation.getHref('/login')}>{t('landing.hero.ctaSignIn')}</a>
             </Button>
           </div>
           
@@ -244,13 +246,13 @@ export default function HomePage() {
           <div className="mt-16 p-4 md:p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 max-w-2xl mx-auto animate-slide-up" style={{animationDelay: '0.6s'}}>
             <div className="flex flex-col sm:flex-row items-center justify-center mb-4 text-center sm:text-left">
               <Monitor className="h-8 w-8 text-blue-600 mr-0 sm:mr-3 mb-2 sm:mb-0" />
-              <h3 className="text-lg md:text-xl font-semibold text-gray-900">Also Available as Desktop App</h3>
+              <h3 className="text-lg md:text-xl font-semibold text-gray-900">{t('landing.desktopBadge.title')}</h3>
             </div>
-            <p className="text-gray-600 mb-4 text-center sm:text-left">Get instant access with global hotkey (Cmd+Shift+S)</p>
+            <p className="text-gray-600 mb-4 text-center sm:text-left">{t('landing.desktopBadge.description')}</p>
             <div className="flex justify-center">
               <Button variant="secondary" size="sm" className="animate-bounce">
                 <Download className="h-4 w-4 mr-2" />
-                Download for Mac
+                {t('landing.desktopBadge.download')}
               </Button>
             </div>
           </div>
@@ -818,7 +820,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-8">
         <div className="container mx-auto px-4 text-center">
-          <p>&copy; 2025 SpeakNative AI. All rights reserved.</p>
+          <p>{t('landing.footer.copyright')}</p>
         </div>
       </footer>
     </div>
