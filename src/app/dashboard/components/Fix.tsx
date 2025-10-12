@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { FormCard, SectionCard, ResultCard, GrammarErrorBadge, DifficultyBadge, FormalityBadge, Textarea } from '@/components/ui'
+import { FormCard, SectionCard, ResultCard, GrammarErrorBadge, DifficultyBadge, FormalityBadge, Textarea, ClickablePhrase } from '@/components/ui'
 import { BookOpen, Target, Lightbulb, MessageSquare } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { InlineContextHint } from './shared/InlineContextHint'
@@ -163,6 +163,7 @@ export default function Fix() {
             original={result.original_phrase}
             corrected={result.corrected_phrase}
             isCorrect={result.is_correct}
+            enableClickableWords={true}
           />
 
           {/* Grammar Errors */}
@@ -223,7 +224,7 @@ export default function Fix() {
                   <div key={index} className="p-4 border border-gray-200 rounded-md bg-blue-50">
                     <div className="flex items-start justify-between mb-2">
                       <h4 className="font-semibold text-lg text-blue-900">
-                        &ldquo;{alternative.expression}&rdquo;
+                        &ldquo;<ClickablePhrase text={alternative.expression} />&rdquo;
                       </h4>
                       <FormalityBadge level={alternative.formality_level as 'formal' | 'informal' | 'neutral'} />
                     </div>

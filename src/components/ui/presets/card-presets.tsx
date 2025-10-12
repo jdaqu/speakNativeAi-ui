@@ -12,6 +12,7 @@ import {
 } from "../primitives/card"
 import { Button } from "../primitives/button"
 import { AlertCircle, CheckCircle2, Info, AlertTriangle } from "lucide-react"
+import { ClickablePhrase } from "../clickable-phrase"
 
 // FormCard - For input forms with built-in footer and error handling
 export interface FormCardProps extends Omit<CardProps, 'padding'> {
@@ -230,12 +231,13 @@ export interface ResultCardProps extends Omit<CardProps, 'padding'> {
   original?: string
   corrected?: string
   isCorrect?: boolean
+  enableClickableWords?: boolean
   children?: React.ReactNode
   className?: string
 }
 
 export const ResultCard = React.forwardRef<HTMLDivElement, ResultCardProps>(
-  ({ title, original, corrected, isCorrect, children, className, ...props }, ref) => {
+  ({ title, original, corrected, isCorrect, enableClickableWords = false, children, className, ...props }, ref) => {
     return (
       <Card
         ref={ref}
@@ -267,9 +269,13 @@ export const ResultCard = React.forwardRef<HTMLDivElement, ResultCardProps>(
           {corrected && !isCorrect && (
             <div>
               <p className="text-sm font-medium text-gray-600 mb-1">Corrected:</p>
-              <p className="p-3 bg-green-50 border border-green-200 rounded-md text-green-800">
-                {corrected}
-              </p>
+              <div className="p-3 bg-green-50 border border-green-200 rounded-md text-green-800">
+                {enableClickableWords ? (
+                  <ClickablePhrase text={corrected} />
+                ) : (
+                  corrected
+                )}
+              </div>
             </div>
           )}
           {children}

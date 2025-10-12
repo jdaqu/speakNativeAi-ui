@@ -132,4 +132,7 @@ export const learningApi = {
 
   define: (word: string, context?: string) =>
     api.post('/learning/define', { word, context }),
+
+  translateWord: (word: string) =>
+    api.post('/learning/translate-word', { word }),
 }

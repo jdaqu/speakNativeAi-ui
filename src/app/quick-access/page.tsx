@@ -1,14 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Button, Input, Textarea, Tabs, TabsContent, TabsList, TabsTrigger, Badge } from '@/components/ui'
-import { 
-  Brain, 
-  Languages, 
-  BookOpen, 
-  X, 
-  Loader2, 
-  CheckCircle, 
+import { Button, Input, Textarea, Tabs, TabsContent, TabsList, TabsTrigger, Badge, ClickablePhrase } from '@/components/ui'
+import {
+  Brain,
+  Languages,
+  BookOpen,
+  X,
+  Loader2,
+  CheckCircle,
   AlertCircle,
   Copy,
   ExternalLink,
@@ -290,7 +290,7 @@ export default function QuickAccessPage() {
                   </div>
                   <div className="space-y-2">
                     <div className="p-2 bg-white rounded border text-sm">
-                      {fixResult.corrected_phrase}
+                      <ClickablePhrase text={fixResult.corrected_phrase} />
                       <Button
                         variant="ghost"
                         size="sm"
@@ -308,7 +308,7 @@ export default function QuickAccessPage() {
                           More native alternative
                         </div>
                         <div className="p-2 bg-white rounded border text-sm">
-                          {fixResult.alternative_expressions[0].expression}
+                          <ClickablePhrase text={fixResult.alternative_expressions[0].expression} />
                           <Button
                             variant="ghost"
                             size="sm"
