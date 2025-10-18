@@ -3,7 +3,9 @@
 import { useState, useMemo } from 'react'
 import { Textarea, FormCard, SectionCard, FormalityBadge } from '@/components/ui'
 import { Languages } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { InlineContextHint } from './shared/InlineContextHint'
+import ExampleButtons from './shared/ExampleButtons'
 import { learningApi } from '@/lib/api'
 import { formatApiError, extractInlineContext } from '@/lib/utils'
 
@@ -21,10 +23,27 @@ interface TranslateResponse {
 }
 
 export default function Translate() {
+  const t = useTranslations('translate')
   const [text, setText] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<TranslateResponse | null>(null)
   const [error, setError] = useState('')
+
+  // Example Spanish phrases to translate to English
+  const examples = [
+    {
+      text: t('examples.meeting.text'),
+      description: t('examples.meeting.description')
+    },
+    {
+      text: t('examples.casual.text'),
+      description: t('examples.casual.description')
+    },
+    {
+      text: t('examples.formal.text'),
+      description: t('examples.formal.description')
+    }
+  ]
 
   // Cache inline context extraction to avoid recalculation
   const { text: extractedText, context: extractedContext } = useMemo(
@@ -64,6 +83,12 @@ export default function Translate() {
     setError('')
   }
 
+  const handleExampleClick = (exampleText: string) => {
+    setText(exampleText)
+    setResult(null)
+    setError('')
+  }
+
   const getFormalityVariant = (level: string): 'formal' | 'informal' | 'neutral' => {
     const normalized = level.toLowerCase()
     if (['formal', 'informal'].includes(normalized)) {
@@ -77,11 +102,11 @@ export default function Translate() {
     <div className="space-y-8">
       {/* Input Section */}
       <FormCard
-        title="Translate Text"
-        description="Translate text with context-aware alternatives and detailed explanations"
+        title={t('title')}
+        description={t('description')}
         primaryButton={{
-          label: 'Translate',
-          loadingLabel: 'Translating...',
+          label: t('getTranslation'),
+          loadingLabel: t('gettingTranslation'),
           isLoading,
           isDisabled: !extractedText,
           form: 'translate-text-form',
@@ -98,12 +123,12 @@ export default function Translate() {
           {/* Text Input */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Text to translate (from Spanish to English)
+              {t('title')}
             </label>
             <Textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="Enter the text you want to translate..."
+              placeholder={t('inputPlaceholder')}
               className="min-h-[100px] resize-vertical"
               disabled={isLoading}
             />
@@ -112,6 +137,13 @@ export default function Translate() {
           {/* Inline context hint */}
           <InlineContextHint context={extractedContext} />
         </form>
+
+        {/* Example buttons */}
+        <ExampleButtons 
+          examples={examples}
+          onExampleClick={handleExampleClick}
+          disabled={isLoading}
+        />
       </FormCard>
 
       {/* Results Section */}
@@ -119,7 +151,7 @@ export default function Translate() {
         <div className="space-y-6">
           {/* Primary Translation */}
           <SectionCard
-            title="Primary Translation"
+            title={t('translation')}
             icon={<Languages className="h-5 w-5" />}
           >
             <div className="space-y-4">

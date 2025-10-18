@@ -4,13 +4,15 @@ import { useAuth } from '@/lib/auth-context'
 import { storage } from '@/lib/storage'
 import { navigation } from '@/lib/navigation'
 import { useEffect, useState } from 'react'
-import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui'
+import { Button, Tabs, TabsContent, TabsList, TabsTrigger, LanguageSwitcher } from '@/components/ui'
 import { Brain, User, LogOut, Languages, BookOpen } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import Fix from './components/Fix'
 import Translate from './components/Translate'
 import Define from './components/Define'
 
 export default function DashboardPage() {
+  const t = useTranslations()
   const { user, isAuthenticated, isLoading, logout } = useAuth()
   const [activeTab, setActiveTab] = useState('fix')
   const [debugInfo, setDebugInfo] = useState('')
@@ -29,16 +31,20 @@ export default function DashboardPage() {
       // Mark that we've checked auth at least once
       setTimeout(() => setHasCheckedAuth(true), 500)
 
-      // Only redirect if we've had time to check auth and there's really no token
-      const timer = setTimeout(() => {
-        if (!isLoading && !isAuthenticated && !token) {
-          navigation.goto('/login')
-        }
-      }, 2000) // Wait 2 seconds
-
-      return () => clearTimeout(timer)
+      // Immediate redirect if no token found
+      if (!token) {
+        navigation.goto('/login')
+        return
+      }
     }
   }, [isAuthenticated, isLoading, user])
+
+  // Redirect immediately if not authenticated after loading
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated && hasCheckedAuth) {
+      navigation.goto('/login')
+    }
+  }, [isLoading, isAuthenticated, hasCheckedAuth])
 
   // Show loading longer and don't redirect until we're sure
   if (!hasCheckedAuth || isLoading) {
@@ -46,7 +52,7 @@ export default function DashboardPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+          <p className="mt-4 text-gray-600">{t('dashboard.loadingDashboard')}</p>
           <p className="mt-2 text-sm text-gray-400">{debugInfo}</p>
         </div>
       </div>
@@ -59,16 +65,17 @@ export default function DashboardPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-gray-600">Authenticating...</p>
+          <p className="mt-4 text-gray-600">{t('dashboard.authenticating')}</p>
           <p className="mt-2 text-sm text-gray-400">{debugInfo}</p>
         </div>
       </div>
     )
   }
 
-  const handleLogout = () => {
-    logout()
-    navigation.goto('/')
+  const handleLogout = async () => {
+    await logout()
+    // In Electron, redirect to login page instead of landing page
+    navigation.goto(isElectron ? '/login' : '/')
   }
 
   if (isLoading) {
@@ -76,7 +83,7 @@ export default function DashboardPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <p className="mt-4 text-gray-600">{t('common.loading')}</p>
           <p className="mt-2 text-sm text-gray-400">{debugInfo}</p>
         </div>
       </div>
@@ -88,7 +95,7 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600">Not authenticated, redirecting...</p>
+          <p className="text-gray-600">{t('dashboard.notAuthenticated')}</p>
           <p className="mt-2 text-sm text-gray-400">{debugInfo}</p>
         </div>
       </div>
@@ -102,19 +109,18 @@ export default function DashboardPage() {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <Brain className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold text-gray-900">SpeakNative AI</span>
+            <span className="text-2xl font-bold text-gray-900">{t('common.appName')}</span>
           </div>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <User className="h-4 w-4 text-gray-500" />
-              <span className="text-sm text-gray-700">Welcome, {user?.username || 'User'}!</span>
+              <span className="text-sm text-gray-700">{t('dashboard.welcomeUser', { username: user?.username || 'User' })}</span>
             </div>
-            {!isElectron && (
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </Button>
-            )}
+            <LanguageSwitcher />
+            <Button variant="ghost" size="sm" onClick={handleLogout}>
+              <LogOut className="h-4 w-4 mr-2" />
+              {t('common.logout')}
+            </Button>
           </div>
         </div>
       </header>
@@ -126,15 +132,15 @@ export default function DashboardPage() {
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="fix">
                 <Brain className="h-4 w-4 mr-2" />
-                Fix My English
+                {t('dashboard.tabs.fix')}
               </TabsTrigger>
               <TabsTrigger value="translate">
                 <Languages className="h-4 w-4 mr-2" />
-                Smart Translator
+                {t('dashboard.tabs.translate')}
               </TabsTrigger>
               <TabsTrigger value="define">
                 <BookOpen className="h-4 w-4 mr-2" />
-                Word Definitions
+                {t('dashboard.tabs.define')}
               </TabsTrigger>
             </TabsList>
             <TabsContent value="fix" className="mt-6">

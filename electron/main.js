@@ -1,6 +1,9 @@
 const { app, BrowserWindow, globalShortcut, Tray, Menu, ipcMain, screen } = require('electron')
 const path = require('path')
-const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged
+const isTest = process.env.NODE_ENV === 'test'
+// Don't use app.isPackaged during module initialization - it's only available after app is ready
+const isDev = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'
+const DEV_SERVER_PORT = process.env.DEV_SERVER_PORT || '3000'
 
 let mainWindow
 let quickAccessWindow
@@ -23,13 +26,19 @@ const createMainWindow = () => {
 
   // Load the app
   console.log('isDev:', isDev)
+  console.log('isTest:', isTest)
   console.log('NODE_ENV:', process.env.NODE_ENV)
   console.log('isPackaged:', app.isPackaged)
-  
-  if (isDev) {
-    console.log('Loading from dev server: http://localhost:3000')
-    mainWindow.loadURL('http://localhost:3000')
-    mainWindow.webContents.openDevTools()
+
+  // In test mode, use dev server (same as dev mode)
+  if (isDev || isTest) {
+    const devServerUrl = `http://localhost:${DEV_SERVER_PORT}`
+    console.log('Loading from dev server:', devServerUrl)
+    mainWindow.loadURL(devServerUrl)
+    // Open DevTools in dev mode but not test mode
+    if (isDev && !isTest) {
+      mainWindow.webContents.openDevTools()
+    }
   } else {
     console.log('Loading from file:', path.join(__dirname, '../out/index.html'))
     // Use loadURL with file protocol for better path resolution
@@ -47,8 +56,9 @@ const createMainWindow = () => {
   })
 
   // Hide window on close instead of quitting (for system tray)
+  // In test mode, allow windows to close normally
   mainWindow.on('close', (event) => {
-    if (!app.isQuiting) {
+    if (!app.isQuiting && !isTest) {
       event.preventDefault()
       mainWindow.hide()
     }
@@ -79,8 +89,9 @@ const createQuickAccessWindow = () => {
   })
 
   // Load the quick access page
-  if (isDev) {
-    quickAccessWindow.loadURL('http://localhost:3000/quick-access')
+  if (isDev || isTest) {
+    const devServerUrl = `http://localhost:${DEV_SERVER_PORT}/quick-access`
+    quickAccessWindow.loadURL(devServerUrl)
   } else {
     const quickAccessPath = path.join(__dirname, '../out/quick-access/index.html')
     quickAccessWindow.loadURL(`file://${quickAccessPath}`)

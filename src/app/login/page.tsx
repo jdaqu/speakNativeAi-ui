@@ -3,17 +3,19 @@
 import { useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { navigation } from '@/lib/navigation'
-import { Button, Input, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui'
+import { Button, Input, Card, CardContent, CardDescription, CardHeader, CardTitle, LanguageSwitcherIcon } from '@/components/ui'
 import { Brain, Eye, EyeOff } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { formatApiError } from '@/lib/utils'
 
 export default function LoginPage() {
+  const t = useTranslations()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  
+
   const { login } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -22,7 +24,7 @@ export default function LoginPage() {
 
     // Validation
     if (password.length > 72) {
-      setError('Password cannot exceed 72 characters')
+      setError(t('auth.login.passwordTooLong'))
       return
     }
 
@@ -43,33 +45,36 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
+          <div className="flex justify-end mb-4">
+            <LanguageSwitcherIcon />
+          </div>
           <a href={navigation.getHref('/')} className="inline-flex items-center space-x-2 mb-4">
             <Brain className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold text-gray-900">SpeakNative AI</span>
+            <span className="text-2xl font-bold text-gray-900">{t('common.appName')}</span>
           </a>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back</h1>
-          <p className="text-gray-600">Sign in to continue your English learning journey</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('auth.login.title')}</h1>
+          <p className="text-gray-600">{t('auth.login.subtitle')}</p>
         </div>
 
         {/* Login Form */}
         <Card>
           <CardHeader>
-            <CardTitle>Sign In</CardTitle>
+            <CardTitle>{t('auth.login.signIn')}</CardTitle>
             <CardDescription>
-              Enter your email and password to access your account
+              {t('auth.login.enterCredentials')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+                <div role="alert" data-testid="login-error" className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
                   {error}
                 </div>
               )}
-              
+
               <div className="space-y-2">
                 <label htmlFor="email" className="text-sm font-medium">
-                  Email
+                  {t('common.email')}
                 </label>
                 <Input
                   id="email"
@@ -83,13 +88,13 @@ export default function LoginPage() {
 
               <div className="space-y-2">
                 <label htmlFor="password" className="text-sm font-medium">
-                  Password
+                  {t('common.password')}
                 </label>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Enter your password"
+                    placeholder={t('common.password')}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     maxLength={72}
@@ -106,15 +111,15 @@ export default function LoginPage() {
               </div>
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Signing in...' : 'Sign In'}
+                {isLoading ? t('auth.login.signingIn') : t('auth.login.signIn')}
               </Button>
             </form>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                Don&apos;t have an account?{' '}
+                {t('auth.login.noAccount')}{' '}
                 <a href={navigation.getHref('/register')} className="text-primary hover:underline font-medium">
-                  Sign up here
+                  {t('auth.login.signUpHere')}
                 </a>
               </p>
             </div>
@@ -123,7 +128,7 @@ export default function LoginPage() {
 
         <div className="text-center mt-8">
           <a href={navigation.getHref('/')} className="text-sm text-gray-500 hover:text-gray-700">
-            ← Back to home
+            ← {t('common.backToHome')}
           </a>
         </div>
       </div>

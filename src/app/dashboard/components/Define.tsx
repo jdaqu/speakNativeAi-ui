@@ -3,7 +3,9 @@
 import { useState, useMemo } from 'react'
 import { FormCard, SectionCard, PartOfSpeechBadge, Input } from '@/components/ui'
 import { Hash, Quote } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { InlineContextHint } from './shared/InlineContextHint'
+import ExampleButtons from './shared/ExampleButtons'
 import { learningApi } from '@/lib/api'
 import { formatApiError, extractInlineContext } from '@/lib/utils'
 
@@ -22,10 +24,27 @@ interface DefineResponse {
 }
 
 export default function Define() {
+  const t = useTranslations('define')
   const [word, setWord] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<DefineResponse | null>(null)
   const [error, setError] = useState('')
+
+  // Example English words and phrases to define
+  const examples = [
+    {
+      text: t('examples.academic.text'),
+      description: t('examples.academic.description')
+    },
+    {
+      text: t('examples.business.text'),
+      description: t('examples.business.description')
+    },
+    {
+      text: t('examples.casual.text'),
+      description: t('examples.casual.description')
+    }
+  ]
 
   // Cache inline context extraction to avoid recalculation
   const { text: extractedText, context: extractedContext } = useMemo(
@@ -57,6 +76,12 @@ export default function Define() {
     setError('')
   }
 
+  const handleExampleClick = (exampleText: string) => {
+    setWord(exampleText)
+    setResult(null)
+    setError('')
+  }
+
 
 
   const handleSynonymClick = (synonym: string) => {
@@ -77,11 +102,11 @@ export default function Define() {
     <div className="space-y-8">
       {/* Input Section */}
       <FormCard
-        title="Look Up a Word"
-        description="Get detailed definitions, examples, and synonyms for any English word"
+        title={t('title')}
+        description={t('description')}
         primaryButton={{
-          label: 'Define Word',
-          loadingLabel: 'Looking up...',
+          label: t('getDefinition'),
+          loadingLabel: t('gettingDefinition'),
           isLoading,
           isDisabled: !extractedText,
           form: 'define-word-form',
@@ -97,12 +122,12 @@ export default function Define() {
         <form id="define-word-form" onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Word to define
+              {t('title')}
             </label>
             <Input
               value={word}
               onChange={(e) => setWord(e.target.value)}
-              placeholder="e.g., serendipity, enigmatic, procrastinate"
+              placeholder={t('inputPlaceholder')}
               disabled={isLoading}
             />
           </div>
@@ -110,6 +135,13 @@ export default function Define() {
           {/* Inline context hint */}
           <InlineContextHint context={extractedContext} />
         </form>
+
+        {/* Example buttons */}
+        <ExampleButtons 
+          examples={examples}
+          onExampleClick={handleExampleClick}
+          disabled={isLoading}
+        />
       </FormCard>
 
       {/* Results Section */}
@@ -131,7 +163,7 @@ export default function Define() {
           {/* Definitions */}
           {result.definitions.length > 0 && (
             <SectionCard
-              title={`Definitions (${result.definitions.length})`}
+              title={t('definition')}
               icon={<Hash className="h-5 w-5" />}
             >
               <div className="space-y-6">
