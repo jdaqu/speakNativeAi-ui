@@ -9,3 +9,6 @@ export * from './primitives/textarea'
 // Preset Components
 export * from './presets/badge-presets'
 export * from './presets/card-presets'
+
+// Custom Components
+export { LanguageSwitcher, LanguageSwitcherCompact, LanguageSwitcherIcon } from './language-switcher'

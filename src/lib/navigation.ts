@@ -11,11 +11,15 @@ export const navigation = {
   goto: (route: string) => {
     if (typeof window === 'undefined') return
 
-    if (isElectron()) {
-      // Electron: Use static HTML paths with proper base URL
+    // Important distinction:
+    // - In packaged Electron (file:// protocol), we must navigate to static HTML files
+    // - In Electron dev (http:// protocol via Next.js dev server), use normal Next.js routes
+    const isFileProtocol = window.location.protocol === 'file:'
+
+    if (isElectron() && isFileProtocol) {
+      // Packaged Electron: Use static HTML paths relative to current HTML file
       const cleanRoute = route.replace(/^\//, '') // Remove leading slash
 
-      // Get the base path (the directory containing the current HTML file)
       const currentPath = window.location.pathname
       const basePath = currentPath.substring(0, currentPath.lastIndexOf('/'))
 
@@ -24,10 +28,11 @@ export const navigation = {
       } else {
         window.location.href = `${basePath}/${cleanRoute}/index.html`
       }
-    } else {
-      // Web: Use standard Next.js routes
-      window.location.href = route
+      return
     }
+
+    // Web or Electron dev server: standard Next.js route navigation
+    window.location.href = route
   },
 
   /**
@@ -36,11 +41,11 @@ export const navigation = {
   getHref: (route: string): string => {
     if (typeof window === 'undefined') return route
 
-    if (isElectron()) {
-      // Electron: Use static HTML paths with proper base URL
-      const cleanRoute = route.replace(/^\//, '')
+    const isFileProtocol = window.location.protocol === 'file:'
 
-      // Get the base path
+    if (isElectron() && isFileProtocol) {
+      // Packaged Electron: return static HTML paths
+      const cleanRoute = route.replace(/^\//, '')
       const currentPath = window.location.pathname
       const basePath = currentPath.substring(0, currentPath.lastIndexOf('/'))
 
@@ -48,9 +53,9 @@ export const navigation = {
         return `${basePath}/index.html`
       }
       return `${basePath}/${cleanRoute}/index.html`
-    } else {
-      // Web: Use standard Next.js routes
-      return route
     }
+
+    // Web or Electron dev server
+    return route
   }
 }

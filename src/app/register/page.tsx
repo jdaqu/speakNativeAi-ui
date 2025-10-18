@@ -3,11 +3,13 @@
 import { useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { navigation } from '@/lib/navigation'
-import { Button, Input, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui'
+import { Button, Input, Card, CardContent, CardDescription, CardHeader, CardTitle, LanguageSwitcherIcon } from '@/components/ui'
 import { Brain, Eye, EyeOff } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { formatApiError } from '@/lib/utils'
 
 export default function RegisterPage() {
+  const t = useTranslations()
   const [formData, setFormData] = useState({
     email: '',
     username: '',
@@ -21,7 +23,7 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  
+
   const { register } = useAuth()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -37,17 +39,17 @@ export default function RegisterPage() {
 
     // Validation
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match')
+      setError(t('auth.register.passwordsMustMatch'))
       return
     }
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long')
+    if (formData.password.length < 8) {
+      setError(t('auth.register.passwordRequirements'))
       return
     }
 
     if (formData.password.length > 72) {
-      setError('Password cannot exceed 72 characters')
+      setError(t('auth.login.passwordTooLong'))
       return
     }
 
@@ -75,26 +77,29 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
+          <div className="flex justify-end mb-4">
+            <LanguageSwitcherIcon />
+          </div>
           <a href={navigation.getHref('/')} className="inline-flex items-center space-x-2 mb-4">
             <Brain className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold text-gray-900">SpeakNative AI</span>
+            <span className="text-2xl font-bold text-gray-900">{t('common.appName')}</span>
           </a>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Get started</h1>
-          <p className="text-gray-600">Create your account to start learning English with AI</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('auth.register.title')}</h1>
+          <p className="text-gray-600">{t('auth.register.subtitle')}</p>
         </div>
 
         {/* Registration Form */}
         <Card>
           <CardHeader>
-            <CardTitle>Create Account</CardTitle>
+            <CardTitle>{t('auth.register.signUp')}</CardTitle>
             <CardDescription>
-              Fill in your information to get started
+              {t('auth.register.enterDetails')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+                <div role="alert" data-testid="registration-error" className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
                   {error}
                 </div>
               )}
