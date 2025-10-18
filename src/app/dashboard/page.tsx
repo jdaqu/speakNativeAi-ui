@@ -31,16 +31,20 @@ export default function DashboardPage() {
       // Mark that we've checked auth at least once
       setTimeout(() => setHasCheckedAuth(true), 500)
 
-      // Only redirect if we've had time to check auth and there's really no token
-      const timer = setTimeout(() => {
-        if (!isLoading && !isAuthenticated && !token) {
-          navigation.goto('/login')
-        }
-      }, 2000) // Wait 2 seconds
-
-      return () => clearTimeout(timer)
+      // Immediate redirect if no token found
+      if (!token) {
+        navigation.goto('/login')
+        return
+      }
     }
   }, [isAuthenticated, isLoading, user])
+
+  // Redirect immediately if not authenticated after loading
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated && hasCheckedAuth) {
+      navigation.goto('/login')
+    }
+  }, [isLoading, isAuthenticated, hasCheckedAuth])
 
   // Show loading longer and don't redirect until we're sure
   if (!hasCheckedAuth || isLoading) {
@@ -70,7 +74,8 @@ export default function DashboardPage() {
 
   const handleLogout = async () => {
     await logout()
-    navigation.goto('/')
+    // In Electron, redirect to login page instead of landing page
+    navigation.goto(isElectron ? '/login' : '/')
   }
 
   if (isLoading) {
@@ -112,12 +117,10 @@ export default function DashboardPage() {
               <span className="text-sm text-gray-700">{t('dashboard.welcomeUser', { username: user?.username || 'User' })}</span>
             </div>
             <LanguageSwitcher />
-            {!isElectron && (
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
-                <LogOut className="h-4 w-4 mr-2" />
-                {t('common.logout')}
-              </Button>
-            )}
+            <Button variant="ghost" size="sm" onClick={handleLogout}>
+              <LogOut className="h-4 w-4 mr-2" />
+              {t('common.logout')}
+            </Button>
           </div>
         </div>
       </header>

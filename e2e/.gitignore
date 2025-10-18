@@ -1,0 +1,13 @@
+# Test results
+test-results/
+
+# Screenshots and videos
+screenshots/
+videos/
+
+# Playwright reports
+playwright-report/
+
+# Trace files
+trace/
+*.zip
