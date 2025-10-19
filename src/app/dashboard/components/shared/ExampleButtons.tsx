@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/ui'
 import { useTranslations } from 'next-intl'
-import { Lightbulb } from 'lucide-react'
 
 interface Example {
   text: string
@@ -42,7 +41,7 @@ export default function ExampleButtons({ examples, onExampleClick, disabled = fa
             className={`text-xs rounded-full transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:transform-none shadow-sm hover:shadow-md ${colorVariants[index % colorVariants.length]}`}
             title={example.description}
           >
-            <span className="font-medium">"{example.text}"</span>
+            <span className="font-medium">&quot;{example.text}&quot;</span>
           </Button>
         ))}
       </div>

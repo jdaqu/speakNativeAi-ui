@@ -10,8 +10,8 @@ export const isElectron = (): boolean => {
   if (userAgent.includes('electron')) return true
 
   // Check for Electron process
-  // @ts-expect-error - window.process is available in Electron environment
-  if (window.process && window.process.type === 'renderer') return true
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if ((window as any).process && (window as any).process.type === 'renderer') return true
 
   // Check for file protocol (static Electron app)
   if (window.location.protocol === 'file:') return true

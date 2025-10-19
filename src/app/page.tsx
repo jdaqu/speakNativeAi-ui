@@ -290,7 +290,7 @@ export default function HomePage() {
                     <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                       <span className="text-red-600 text-sm">✗</span>
                     </div>
-                    <p className="text-gray-600">Generic examples don't match your real writing patterns</p>
+                    <p className="text-gray-600">Generic examples don&apos;t match your real writing patterns</p>
                   </div>
                 </div>
               </div>
@@ -534,7 +534,7 @@ export default function HomePage() {
               {/* Video Description */}
               <div className="mt-6 text-center">
                 <p className="text-gray-600 text-sm">
-                  <span className="font-semibold">What you'll see:</span> Real-time correction of an email, 
+                  <span className="font-semibold">What you&apos;ll see:</span> Real-time correction of an email,
                   automatic mistake tracking, and personalized practice generation - all in under 30 seconds.
                 </p>
               </div>
@@ -719,7 +719,7 @@ export default function HomePage() {
                   </div>
                 </div>
                 <p className="text-gray-700 italic">
-                  "Finally, I can fix my emails without the ChatGPT hassle! The app tracks my mistakes and creates practice exercises from my actual writing patterns. Game changer for work."
+                  &quot;Finally, I can fix my emails without the ChatGPT hassle! The app tracks my mistakes and creates practice exercises from my actual writing patterns. Game changer for work.&quot;
                 </p>
                 <div className="flex text-yellow-400 mt-4">
                   {'★'.repeat(5)}
@@ -739,7 +739,7 @@ export default function HomePage() {
                   </div>
                 </div>
                 <p className="text-gray-700 italic">
-                  "As a PhD student, I write constantly in English. The desktop app with Cmd+Shift+S saves me hours every week. Plus, I'm actually learning from my mistakes now!"
+                  &quot;As a PhD student, I write constantly in English. The desktop app with Cmd+Shift+S saves me hours every week. Plus, I&apos;m actually learning from my mistakes now!&quot;
                 </p>
                 <div className="flex text-yellow-400 mt-4">
                   {'★'.repeat(5)}
@@ -759,7 +759,7 @@ export default function HomePage() {
                   </div>
                 </div>
                 <p className="text-gray-700 italic">
-                  "I work in a global company and need to communicate professionally. SpeakNative AI learns my communication style and helps me sound more natural. The personalized learning is brilliant!"
+                  &quot;I work in a global company and need to communicate professionally. SpeakNative AI learns my communication style and helps me sound more natural. The personalized learning is brilliant!&quot;
                 </p>
                 <div className="flex text-yellow-400 mt-4">
                   {'★'.repeat(5)}

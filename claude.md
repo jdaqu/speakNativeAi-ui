@@ -139,6 +139,47 @@ The app consists of a **main process** (`electron/main.js`) that manages windows
     2.  Waits for the server to be ready.
     3.  Launches the Electron application, which loads the UI from the dev server.
 
+### Verification & Code Quality Scripts
+
+Before deploying or committing code, use these scripts to ensure your code passes all checks that Vercel (or any CI/CD) will run:
+
+#### Available Scripts
+
+-   **`npm run typecheck`**: Runs TypeScript type checking without generating any build artifacts. Fast and useful for catching type errors.
+-   **`npm run lint`**: Runs ESLint to check for code quality and style issues. This is what Vercel runs during deployment.
+-   **`npm run lint:fix`**: Automatically fixes ESLint issues that can be auto-corrected (like formatting, quotes, etc.).
+-   **`npm run verify`**: Runs both `typecheck` and `lint` in sequence. **Recommended before every commit/push.**
+
+#### When to Use
+
+1.  **Before committing**: Run `npm run verify` to catch errors early
+2.  **Before pushing**: Ensures your code will pass Vercel's deployment checks
+3.  **During development**: Use `npm run lint:fix` to automatically fix common issues
+4.  **CI/CD pipeline**: Add `npm run verify` to your GitHub Actions workflow
+
+#### Why Use These Instead of `npm run build`?
+
+-   **Much faster**: No compilation or asset generation
+-   **Cleaner workspace**: Doesn't create the `.next` folder or production assets
+-   **Same checks as Vercel**: Catches TypeScript errors and ESLint issues that would fail deployment
+-   **Perfect for pre-commit hooks**: Quick validation before committing
+
+**Example workflow:**
+```bash
+# Make your changes
+# ...
+
+# Verify everything passes
+npm run verify
+
+# If there are auto-fixable issues
+npm run lint:fix
+
+# Commit your changes
+git add .
+git commit -m "Your commit message"
+```
+
 ### Build & Package for Production
 Use the scripts in `package.json` to build a distributable application:
 -   `npm run electron:pack`: Builds the application for your current platform into the `dist/` folder.
