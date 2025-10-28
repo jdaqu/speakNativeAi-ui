@@ -4,9 +4,10 @@ import { useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { navigation } from '@/lib/navigation'
 import { Button, Input, Card, CardContent, CardDescription, CardHeader, CardTitle, LanguageSwitcherIcon } from '@/components/ui'
-import { Brain, Eye, EyeOff } from 'lucide-react'
+import { Brain, Eye, EyeOff, Mail } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { formatApiError } from '@/lib/utils'
+import ResendVerificationModal from '@/components/ResendVerificationModal'
 
 export default function LoginPage() {
   const t = useTranslations()
@@ -15,12 +16,15 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showResendModal, setShowResendModal] = useState(false)
+  const [isUnverifiedError, setIsUnverifiedError] = useState(false)
 
   const { login } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setIsUnverifiedError(false)
 
     // Validation
     if (password.length > 72) {
@@ -34,8 +38,16 @@ export default function LoginPage() {
       await login(email, password)
       navigation.goto('/dashboard')
     } catch (err: unknown) {
-        setError(formatApiError(err))
-      } finally {
+      const errorMessage = formatApiError(err)
+      setError(errorMessage)
+
+      // Check if error is related to inactive/unverified account
+      if (errorMessage.toLowerCase().includes('inactive') ||
+          errorMessage.toLowerCase().includes('not active') ||
+          errorMessage.toLowerCase().includes('verify')) {
+        setIsUnverifiedError(true)
+      }
+    } finally {
       setIsLoading(false)
     }
   }
@@ -67,8 +79,34 @@ export default function LoginPage() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
-                <div role="alert" data-testid="login-error" className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
-                  {error}
+                <div className="space-y-3">
+                  <div role="alert" data-testid="login-error" className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+                    {error}
+                  </div>
+
+                  {/* Resend Verification Button */}
+                  {isUnverifiedError && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+                      <div className="flex items-start space-x-3">
+                        <Mail className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                          <h4 className="text-sm font-semibold text-blue-900 mb-1">
+                            Email Not Verified
+                          </h4>
+                          <p className="text-sm text-blue-700 mb-3">
+                            Please verify your email address to log in. Check your inbox for the verification link.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => setShowResendModal(true)}
+                            className="text-sm font-medium text-blue-600 hover:text-blue-800 underline"
+                          >
+                            Resend Verification Email
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -115,7 +153,17 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            <div className="mt-6 text-center">
+            {/* Forgot Password Link */}
+            <div className="mt-4 text-center">
+              <a
+                href={navigation.getHref('/forgot-password')}
+                className="text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium"
+              >
+                Forgot Password?
+              </a>
+            </div>
+
+            <div className="mt-4 text-center">
               <p className="text-sm text-gray-600">
                 {t('auth.login.noAccount')}{' '}
                 <a href={navigation.getHref('/register')} className="text-primary hover:underline font-medium">
@@ -132,6 +180,13 @@ export default function LoginPage() {
           </a>
         </div>
       </div>
+
+      {/* Resend Verification Modal */}
+      <ResendVerificationModal
+        isOpen={showResendModal}
+        onClose={() => setShowResendModal(false)}
+        initialEmail={email}
+      />
     </div>
   )
 } 
