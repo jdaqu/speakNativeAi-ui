@@ -123,7 +123,7 @@ export default function RegisterPage() {
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-left">
                   <p className="text-sm text-yellow-800">
                     <strong>Note:</strong> The verification link will expire in 24 hours.
-                    If you don't see the email, check your spam folder.
+                    If you don&apos;t see the email, check your spam folder.
                   </p>
                 </div>
 

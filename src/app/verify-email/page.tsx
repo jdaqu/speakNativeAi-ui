@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { CloudCog } from "lucide-react";
 
 const VerifyEmailPage = () => {
   const router = useRouter();

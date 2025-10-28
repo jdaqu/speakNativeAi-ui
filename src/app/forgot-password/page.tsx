@@ -99,7 +99,7 @@ const ForgotPasswordPage = () => {
               <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 text-left">
                 <p className="text-sm text-yellow-800 dark:text-yellow-200">
                   <strong>Note:</strong> The reset link will expire in 1 hour for security.
-                  If you don't see the email, check your spam folder.
+                  If you don&apos;t see the email, check your spam folder.
                 </p>
               </div>
 
@@ -137,7 +137,7 @@ const ForgotPasswordPage = () => {
                 Forgot Password?
               </h1>
               <p className="text-center text-gray-600 dark:text-gray-300 mb-6">
-                No worries! Enter your email and we'll send you a reset link.
+                No worries! Enter your email and we&apos;ll send you a reset link.
               </p>
 
               {/* Form */}

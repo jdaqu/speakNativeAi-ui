@@ -143,7 +143,7 @@ export default function ResendVerificationModal({
         {/* Help Text */}
         <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
           <p className="text-xs text-gray-600 dark:text-gray-400 text-center">
-            Didn't receive the email? Check your spam folder or wait a few minutes before
+            Didn&apos;t receive the email? Check your spam folder or wait a few minutes before
             requesting another one.
           </p>
         </div>
