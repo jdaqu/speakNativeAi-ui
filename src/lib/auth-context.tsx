@@ -106,8 +106,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = async (userData: RegisterData) => {
     try {
+      // Create account - user will need to verify email before logging in
       await api.post('/auth/register', userData)
-      await login(userData.email, userData.password)
+      // Don't auto-login - user must verify email first
     } catch (error) {
       throw error
     }
