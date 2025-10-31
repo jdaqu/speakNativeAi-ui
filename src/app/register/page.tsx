@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { navigation } from '@/lib/navigation'
 import { Button, Input, Card, CardContent, CardDescription, CardHeader, CardTitle, LanguageSwitcherIcon } from '@/components/ui'
-import { Brain, Eye, EyeOff } from 'lucide-react'
+import { Brain, Eye, EyeOff, Mail, CheckCircle } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { formatApiError } from '@/lib/utils'
 
@@ -23,6 +23,8 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [registrationSuccess, setRegistrationSuccess] = useState(false)
+  const [registeredEmail, setRegisteredEmail] = useState('')
 
   const { register } = useAuth()
 
@@ -64,12 +66,105 @@ export default function RegisterPage() {
         native_language: formData.native_language,
         target_language: formData.target_language
       })
-      navigation.goto('/dashboard')
+      // Show success message instead of auto-login
+      setRegistrationSuccess(true)
+      setRegisteredEmail(formData.email)
     } catch (err: unknown) {
       setError(formatApiError(err))
     } finally {
       setIsLoading(false)
     }
+  }
+
+  // Show success message after registration
+  if (registrationSuccess) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-center space-y-6">
+                {/* Success Icon */}
+                <div className="flex justify-center">
+                  <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+                    <CheckCircle className="h-8 w-8 text-green-600" />
+                  </div>
+                </div>
+
+                {/* Success Title */}
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    Account Created Successfully!
+                  </h2>
+                  <p className="text-gray-600">
+                    Please check your email to verify your account
+                  </p>
+                </div>
+
+                {/* Email Info */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center justify-center space-x-2 text-blue-700">
+                    <Mail className="h-5 w-5" />
+                    <span className="font-medium">{registeredEmail}</span>
+                  </div>
+                </div>
+
+                {/* Instructions */}
+                <div className="space-y-3 text-left bg-gray-50 rounded-lg p-4">
+                  <h3 className="font-semibold text-gray-900">Next Steps:</h3>
+                  <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700">
+                    <li>Check your email inbox for a verification link</li>
+                    <li>Click the link to verify your email address</li>
+                    <li>Return here to log in and start learning!</li>
+                  </ol>
+                </div>
+
+                {/* Warning */}
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-left">
+                  <p className="text-sm text-yellow-800">
+                    <strong>Note:</strong> The verification link will expire in 24 hours.
+                    If you don&apos;t see the email, check your spam folder.
+                  </p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="space-y-3 pt-4">
+                  <a
+                    href={navigation.getHref('/login')}
+                    className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition duration-200 text-center"
+                  >
+                    Go to Login Page
+                  </a>
+                  <button
+                    onClick={() => {
+                      setRegistrationSuccess(false)
+                      setFormData({
+                        email: '',
+                        username: '',
+                        password: '',
+                        confirmPassword: '',
+                        full_name: '',
+                        native_language: 'Spanish',
+                        target_language: 'English'
+                      })
+                    }}
+                    className="block w-full bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium py-3 px-4 rounded-lg transition duration-200 text-center"
+                  >
+                    Register Another Account
+                  </button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="text-center mt-6">
+            <a href={navigation.getHref('/')} className="text-sm text-gray-500 hover:text-gray-700">
+              ← Back to home
+            </a>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
