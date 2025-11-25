@@ -19,6 +19,25 @@ const getBaseURL = () => {
   return 'http://localhost:8000/api/v1'
 }
 
+/**
+ * Get the base API URL without the /api/v1 suffix
+ * Used for constructing OAuth redirect URLs
+ */
+export const getApiBaseUrl = () => {
+  if (isElectron) {
+    // Use the API URL from preload script if available
+    if (typeof window !== 'undefined' && window.electronAPI?.getApiBaseUrl) {
+      return window.electronAPI.getApiBaseUrl()
+    }
+    return 'http://localhost:8000/api'
+  }
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return `${process.env.NEXT_PUBLIC_API_URL}/api`
+  }
+  // Fallback for non-docker local development
+  return 'http://localhost:8000/api'
+}
+
 // Create axios instance with base configuration
 export const api = axios.create({
   baseURL: getBaseURL(),

@@ -22,6 +22,7 @@ interface AuthContextType {
   register: (userData: RegisterData) => Promise<void>
   logout: () => void
   isAuthenticated: boolean
+  handleOAuthCallback: (accessToken: string) => Promise<void>
 }
 
 interface RegisterData {
@@ -127,6 +128,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const handleOAuthCallback = async (accessToken: string) => {
+    try {
+      // Store access token using universal storage
+      await storage.setToken(accessToken)
+      api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
+
+      // Fetch user info
+      await checkAuth()
+    } catch (error: unknown) {
+      // Provide user-friendly error messages
+      const errorObj = error as { code?: string; message?: string }
+      if (errorObj?.code === 'ECONNREFUSED' || errorObj?.message?.includes('Network Error')) {
+        throw new Error('Cannot connect to server. Please make sure the backend is running.')
+      }
+      throw error
+    }
+  }
+
   const value = {
     user,
     isLoading,
@@ -134,6 +153,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     register,
     logout,
     isAuthenticated: !!user,
+    handleOAuthCallback,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
