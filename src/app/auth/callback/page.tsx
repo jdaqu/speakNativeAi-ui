@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { navigation } from '@/lib/navigation'
@@ -13,9 +13,17 @@ export default function OAuthCallbackPage() {
   const searchParams = useSearchParams()
   const { handleOAuthCallback } = useAuth()
   const [error, setError] = useState<string | null>(null)
+  const hasProcessed = useRef(false)
 
   useEffect(() => {
+    // Prevent multiple executions
+    if (hasProcessed.current) {
+      return
+    }
+
     const processCallback = async () => {
+      hasProcessed.current = true
+
       try {
         // Extract token from URL
         const accessToken = searchParams.get('access_token')
