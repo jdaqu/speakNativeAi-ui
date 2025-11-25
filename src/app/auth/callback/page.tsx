@@ -19,7 +19,6 @@ export default function OAuthCallbackPage() {
       try {
         // Extract token from URL
         const accessToken = searchParams.get('access_token')
-        const tokenType = searchParams.get('token_type')
 
         if (!accessToken) {
           setError('No access token received')
