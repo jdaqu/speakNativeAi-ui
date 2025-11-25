@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { api } from './api'
 import { storage } from './storage'
 
@@ -22,6 +22,7 @@ interface AuthContextType {
   register: (userData: RegisterData) => Promise<void>
   logout: () => void
   isAuthenticated: boolean
+  handleOAuthCallback: (accessToken: string) => Promise<void>
 }
 
 interface RegisterData {
@@ -39,19 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(false) // Start as false for packaged app
 
-  useEffect(() => {
-    // Only check auth if we have a token, otherwise skip loading
-    const initAuth = async () => {
-      const token = await storage.getToken()
-      if (token) {
-        setIsLoading(true)
-        await checkAuth()
-      }
-    }
-    initAuth()
-  }, [])
-
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       const token = await storage.getToken()
       if (token) {
@@ -82,7 +71,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    // Only check auth if we have a token, otherwise skip loading
+    const initAuth = async () => {
+      const token = await storage.getToken()
+      if (token) {
+        setIsLoading(true)
+        await checkAuth()
+      }
+    }
+    initAuth()
+  }, [checkAuth])
 
   const login = async (email: string, password: string) => {
     try {
@@ -127,6 +128,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const handleOAuthCallback = useCallback(async (accessToken: string) => {
+    try {
+      // Store access token using universal storage
+      await storage.setToken(accessToken)
+      api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
+
+      // Fetch user info
+      await checkAuth()
+    } catch (error: unknown) {
+      // Provide user-friendly error messages
+      const errorObj = error as { code?: string; message?: string }
+      if (errorObj?.code === 'ECONNREFUSED' || errorObj?.message?.includes('Network Error')) {
+        throw new Error('Cannot connect to server. Please make sure the backend is running.')
+      }
+      throw error
+    }
+  }, [checkAuth])
+
   const value = {
     user,
     isLoading,
@@ -134,6 +153,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     register,
     logout,
     isAuthenticated: !!user,
+    handleOAuthCallback,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
