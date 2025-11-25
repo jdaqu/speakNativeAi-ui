@@ -157,7 +157,9 @@
       "enterCredentials": "Enter your email and password to access your account",
       "noAccount": "Don't have an account?",
       "signUpHere": "Sign up here",
-      "passwordTooLong": "Password cannot exceed 72 characters"
+      "passwordTooLong": "Password cannot exceed 72 characters",
+      "signInWithGoogle": "Sign in with Google",
+      "or": "or"
     },
     "register": {
       "title": "Create your account",
@@ -169,7 +171,14 @@
       "signInHere": "Sign in here",
       "passwordRequirements": "Password must be at least 8 characters",
       "confirmPassword": "Confirm Password",
-      "passwordsMustMatch": "Passwords must match"
+      "passwordsMustMatch": "Passwords must match",
+      "signUpWithGoogle": "Sign up with Google",
+      "or": "or"
+    },
+    "oauth": {
+      "completingSignIn": "Completing sign in...",
+      "error": "Authentication failed. Please try again.",
+      "errorTitle": "Sign In Failed"
     }
   },
   "dashboard": {

@@ -157,7 +157,9 @@
       "enterCredentials": "Ingresa tu correo electrónico y contraseña para acceder a tu cuenta",
       "noAccount": "¿No tienes una cuenta?",
       "signUpHere": "Regístrate aquí",
-      "passwordTooLong": "La contraseña no puede exceder 72 caracteres"
+      "passwordTooLong": "La contraseña no puede exceder 72 caracteres",
+      "signInWithGoogle": "Iniciar sesión con Google",
+      "or": "o"
     },
     "register": {
       "title": "Crea tu cuenta",
@@ -169,7 +171,14 @@
       "signInHere": "Inicia sesión aquí",
       "passwordRequirements": "La contraseña debe tener al menos 8 caracteres",
       "confirmPassword": "Confirmar contraseña",
-      "passwordsMustMatch": "Las contraseñas deben coincidir"
+      "passwordsMustMatch": "Las contraseñas deben coincidir",
+      "signUpWithGoogle": "Registrarse con Google",
+      "or": "o"
+    },
+    "oauth": {
+      "completingSignIn": "Completando inicio de sesión...",
+      "error": "Error de autenticación. Por favor, inténtalo de nuevo.",
+      "errorTitle": "Error al Iniciar Sesión"
     }
   },
   "dashboard": {
