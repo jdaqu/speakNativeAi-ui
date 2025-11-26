@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from '@/lib/auth-context'
 import { LocaleProvider } from '@/lib/locale-context'
+import { GoogleAnalyticsWrapper } from '@/components/GoogleAnalytics'
 
 const inter = Inter({
   subsets: ["latin"],
@@ -34,6 +35,7 @@ export default function RootLayout({
             {children}
           </AuthProvider>
         </LocaleProvider>
+        <GoogleAnalyticsWrapper />
       </body>
     </html>
   );

@@ -8,6 +8,7 @@ import { InlineContextHint } from './shared/InlineContextHint'
 import ExampleButtons from './shared/ExampleButtons'
 import { learningApi } from '@/lib/api'
 import { formatApiError, extractInlineContext } from '@/lib/utils'
+import { trackFeatureUsage } from '@/lib/analytics'
 
 interface Definition {
   part_of_speech: string
@@ -63,6 +64,8 @@ export default function Define() {
     try {
       const response = await learningApi.define(extractedText, extractedContext)
       setResult(response.data)
+      // Track feature usage
+      trackFeatureUsage('define')
     } catch (err: unknown) {
       setError(formatApiError(err))
     } finally {

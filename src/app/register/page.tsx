@@ -8,6 +8,7 @@ import { Brain, Eye, EyeOff, Mail, CheckCircle } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { formatApiError } from '@/lib/utils'
 import { getApiBaseUrl } from '@/lib/api'
+import { trackRegistration } from '@/lib/analytics'
 
 export default function RegisterPage() {
   const t = useTranslations()
@@ -30,6 +31,8 @@ export default function RegisterPage() {
   const { register } = useAuth()
 
   const handleGoogleSignUp = () => {
+    // Track Google sign-up attempt
+    trackRegistration('google')
     const apiBaseUrl = getApiBaseUrl()
     window.location.href = `${apiBaseUrl}/v1/auth/google/login`
   }
@@ -72,6 +75,8 @@ export default function RegisterPage() {
         native_language: formData.native_language,
         target_language: formData.target_language
       })
+      // Track registration event
+      trackRegistration('email')
       // Show success message instead of auto-login
       setRegistrationSuccess(true)
       setRegisteredEmail(formData.email)

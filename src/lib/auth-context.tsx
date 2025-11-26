@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { api } from './api'
 import { storage } from './storage'
+import { trackLogin } from './analytics'
 
 interface User {
   id: number
@@ -94,6 +95,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await storage.setToken(access_token)
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
 
+      // Track login event
+      trackLogin('email')
+
       await checkAuth()
     } catch (error: unknown) {
       // Provide user-friendly error messages
@@ -133,6 +137,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Store access token using universal storage
       await storage.setToken(accessToken)
       api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
+
+      // Track Google OAuth login event
+      trackLogin('google')
 
       // Fetch user info
       await checkAuth()
