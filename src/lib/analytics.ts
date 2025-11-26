@@ -9,11 +9,19 @@
 const isElectron = typeof window !== 'undefined' && 
   !!(window as unknown as { electronAPI?: { isElectron?: boolean } }).electronAPI?.isElectron;
 
+// Type declaration for window with gtag
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+    dataLayer?: unknown[];
+  }
+}
+
 // Check if GA4 is available (gtag function exists)
 const isGA4Available = (): boolean => {
   if (isElectron) return false;
   if (typeof window === 'undefined') return false;
-  return typeof (window as { gtag?: (...args: unknown[]) => void }).gtag === 'function';
+  return typeof window.gtag === 'function';
 };
 
 /**
@@ -32,8 +40,9 @@ export const trackEvent = (
   }
 
   try {
-    const gtag = (window as { gtag: (...args: unknown[]) => void }).gtag;
-    gtag('event', eventName, eventParams || {});
+    if (window.gtag) {
+      window.gtag('event', eventName, eventParams || {});
+    }
   } catch (error) {
     // Silently fail - don't break the app if analytics fails
     console.warn('Analytics tracking failed:', error);
