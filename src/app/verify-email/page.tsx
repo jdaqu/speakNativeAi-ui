@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { trackEmailVerification } from '@/lib/analytics'
 
 const VerifyEmailPage = () => {
   const router = useRouter();
@@ -82,6 +83,9 @@ const VerifyEmailPage = () => {
             username: data.username || "Not provided",
           });
 
+          // Track successful email verification
+          trackEmailVerification('success');
+
           // Redirect to login after 3 seconds
           setTimeout(() => {
             router.push("/login");
@@ -123,12 +127,16 @@ const VerifyEmailPage = () => {
             console.log("Error detected, showing error UI");
             setStatus("error");
             setMessage(data.detail || data.message || "Verification failed. Please try again.");
+            // Track failed email verification
+            trackEmailVerification('error');
           }
         }
       } catch (error) {
         console.error("Verification error:", error);
         setStatus("error");
         setMessage("Network error. Please check your connection and try again.");
+        // Track failed email verification
+        trackEmailVerification('error');
       }
     };
 

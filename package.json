@@ -27,6 +27,7 @@
     "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
+    "@next/third-parties": "^16.0.4",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.3",

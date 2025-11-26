@@ -8,6 +8,7 @@ import { InlineContextHint } from './shared/InlineContextHint'
 import ExampleButtons from './shared/ExampleButtons'
 import { learningApi } from '@/lib/api'
 import { formatApiError, extractInlineContext } from '@/lib/utils'
+import { trackFeatureUsage } from '@/lib/analytics'
 
 interface TranslationAlternative {
   translation: string
@@ -70,6 +71,8 @@ export default function Translate() {
         extractedContext
       )
       setResult(response.data)
+      // Track feature usage
+      trackFeatureUsage('translate')
     } catch (err: unknown) {
       setError(formatApiError(err))
     } finally {

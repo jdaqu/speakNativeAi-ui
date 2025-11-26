@@ -8,6 +8,7 @@ import { InlineContextHint } from './shared/InlineContextHint'
 import ExampleButtons from './shared/ExampleButtons'
 import { learningApi } from '@/lib/api'
 import { formatApiError, extractInlineContext } from '@/lib/utils'
+import { trackFeatureUsage } from '@/lib/analytics'
 
 interface GrammarError {
   error_type: string
@@ -87,6 +88,8 @@ export default function Fix() {
     try {
       const response = await learningApi.fixPhrase(extractedText, extractedContext)
       setResult(response.data)
+      // Track feature usage
+      trackFeatureUsage('fix')
     } catch (err: unknown) {
       setError(formatApiError(err))
     } finally {
