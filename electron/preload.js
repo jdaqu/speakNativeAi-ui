@@ -20,5 +20,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Shared token storage (accessible across all windows)
   getSharedToken: () => ipcRenderer.invoke('get-shared-token'),
   setSharedToken: (token) => ipcRenderer.invoke('set-shared-token', token),
-  removeSharedToken: () => ipcRenderer.invoke('remove-shared-token')
+  removeSharedToken: () => ipcRenderer.invoke('remove-shared-token'),
+
+  // OAuth handlers
+  openGoogleLogin: (apiBaseUrl) => {
+    console.log('Preload: openGoogleLogin called with:', apiBaseUrl)
+    return ipcRenderer.invoke('open-google-login', apiBaseUrl)
+  },
+  onOAuthCallback: (callback) => {
+    ipcRenderer.on('oauth-callback', (event, data) => callback(data))
+  },
+  removeOAuthListener: () => {
+    ipcRenderer.removeAllListeners('oauth-callback')
+  }
 }) 

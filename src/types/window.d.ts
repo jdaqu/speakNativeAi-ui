@@ -10,6 +10,9 @@ declare global {
       getSharedToken: () => Promise<string | null>
       setSharedToken: (token: string) => Promise<boolean>
       removeSharedToken: () => Promise<boolean>
+      openGoogleLogin: (apiBaseUrl: string) => Promise<boolean>
+      onOAuthCallback: (callback: (data: { success: boolean; accessToken?: string; error?: string }) => void) => void
+      removeOAuthListener: () => void
     }
   }
 }

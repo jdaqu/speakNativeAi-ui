@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { navigation } from '@/lib/navigation'
 import { Button, Input, Card, CardContent, CardDescription, CardHeader, CardTitle, LanguageSwitcherIcon } from '@/components/ui'
@@ -9,6 +9,7 @@ import { useTranslations } from 'next-intl'
 import { formatApiError } from '@/lib/utils'
 import { getApiBaseUrl } from '@/lib/api'
 import { trackRegistration } from '@/lib/analytics'
+import { isElectron } from '@/lib/environment'
 
 export default function RegisterPage() {
   const t = useTranslations()
@@ -28,13 +29,47 @@ export default function RegisterPage() {
   const [registrationSuccess, setRegistrationSuccess] = useState(false)
   const [registeredEmail, setRegisteredEmail] = useState('')
 
-  const { register } = useAuth()
+  const { register, handleOAuthCallback } = useAuth()
+
+  useEffect(() => {
+    // Set up OAuth callback listener for Electron
+    if (isElectron() && window.electronAPI?.onOAuthCallback) {
+      const handleElectronOAuth = async (data: { success: boolean; accessToken?: string; error?: string }) => {
+        if (data.success && data.accessToken) {
+          try {
+            await handleOAuthCallback(data.accessToken)
+            navigation.goto('/dashboard')
+          } catch (err) {
+            setError(formatApiError(err))
+          }
+        } else {
+          setError(data.error || 'OAuth authentication failed')
+        }
+      }
+
+      window.electronAPI.onOAuthCallback(handleElectronOAuth)
+
+      // Cleanup listener on unmount
+      return () => {
+        if (window.electronAPI?.removeOAuthListener) {
+          window.electronAPI.removeOAuthListener()
+        }
+      }
+    }
+  }, [handleOAuthCallback])
 
   const handleGoogleSignUp = () => {
     // Track Google sign-up attempt
     trackRegistration('google')
     const apiBaseUrl = getApiBaseUrl()
-    window.location.href = `${apiBaseUrl}/v1/auth/google/login`
+    
+    if (isElectron() && window.electronAPI?.openGoogleLogin) {
+      // Use Electron's OAuth flow
+      window.electronAPI.openGoogleLogin(apiBaseUrl)
+    } else {
+      // Use web OAuth flow
+      window.location.href = `${apiBaseUrl}/v1/auth/google/login`
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

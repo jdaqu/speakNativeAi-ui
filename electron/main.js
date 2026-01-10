@@ -1,4 +1,4 @@
-const { app, BrowserWindow, globalShortcut, Tray, Menu, ipcMain, screen } = require('electron')
+const { app, BrowserWindow, globalShortcut, Tray, Menu, ipcMain, screen, shell, protocol } = require('electron')
 const path = require('path')
 const isTest = process.env.NODE_ENV === 'test'
 // Don't use app.isPackaged during module initialization - it's only available after app is ready
@@ -8,6 +8,7 @@ const DEV_SERVER_PORT = process.env.DEV_SERVER_PORT || '3000'
 let mainWindow
 let quickAccessWindow
 let tray
+let pendingOAuthUrl = null
 
 // Keep a global reference of the window object
 const createMainWindow = () => {
@@ -53,6 +54,13 @@ const createMainWindow = () => {
   // Show window when ready
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
+
+    // Process any pending OAuth callback from cold start
+    if (pendingOAuthUrl) {
+      const url = pendingOAuthUrl
+      pendingOAuthUrl = null
+      handleOAuthCallback(url)
+    }
   })
 
   // Hide window on close instead of quitting (for system tray)
@@ -181,6 +189,89 @@ const showQuickAccess = () => {
   }
 }
 
+// Register custom protocol for OAuth callback
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient('speaknativeai', process.execPath, [path.resolve(process.argv[1])])
+  }
+} else {
+  app.setAsDefaultProtocolClient('speaknativeai')
+}
+
+// Handle OAuth callback from deep link
+const handleOAuthCallback = (url) => {
+  try {
+    // Parse the URL to get the access token
+    const urlObj = new URL(url)
+    const params = new URLSearchParams(urlObj.search)
+    const accessToken = params.get('access_token')
+    const error = params.get('error')
+
+    if (accessToken) {
+      // Send token to all windows
+      if (mainWindow) {
+        mainWindow.webContents.send('oauth-callback', { success: true, accessToken })
+        mainWindow.show()
+        mainWindow.focus()
+      } else {
+        // Queue the callback for when window is ready (cold start scenario)
+        pendingOAuthUrl = url
+      }
+      if (quickAccessWindow) {
+        quickAccessWindow.webContents.send('oauth-callback', { success: true, accessToken })
+      }
+    } else {
+      // Handle error - use error param if available, fallback to message, then generic
+      const errorMessage = error || params.get('message') || 'OAuth authentication failed'
+      if (mainWindow) {
+        mainWindow.webContents.send('oauth-callback', { success: false, error: errorMessage })
+        mainWindow.show()
+        mainWindow.focus()
+      } else {
+        // Queue the callback for when window is ready (cold start scenario)
+        pendingOAuthUrl = url
+      }
+    }
+  } catch (err) {
+    console.error('Failed to parse OAuth callback URL:', err.message)
+    if (mainWindow) {
+      mainWindow.webContents.send('oauth-callback', {
+        success: false,
+        error: 'Invalid OAuth callback URL'
+      })
+      mainWindow.show()
+      mainWindow.focus()
+    }
+  }
+}
+
+// Handle protocol for macOS
+app.on('open-url', (event, url) => {
+  event.preventDefault()
+  handleOAuthCallback(url)
+})
+
+// Handle protocol for Windows/Linux
+const gotTheLock = app.requestSingleInstanceLock()
+
+if (!gotTheLock) {
+  app.quit()
+} else {
+  app.on('second-instance', (event, commandLine) => {
+    // Someone tried to run a second instance, we should focus our window instead.
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.focus()
+    }
+    
+    // Handle deep link on Windows/Linux
+    const url = commandLine.find((arg) => arg.startsWith('speaknativeai://'))
+    if (url) {
+      handleOAuthCallback(url)
+    }
+  })
+}
+
 // App event handlers
 app.whenReady().then(() => {
   createMainWindow()
@@ -257,5 +348,14 @@ ipcMain.handle('set-shared-token', (event, token) => {
 
 ipcMain.handle('remove-shared-token', () => {
   sharedAuthToken = null
+  return true
+})
+
+// OAuth handlers
+ipcMain.handle('open-google-login', async (event, apiBaseUrl) => {
+  // Open Google OAuth login in default browser with platform=electron parameter
+  const loginUrl = `${apiBaseUrl}/v1/auth/google/login?platform=electron`
+  console.log('Opening Google OAuth URL:', loginUrl)
+  await shell.openExternal(loginUrl)
   return true
 }) 

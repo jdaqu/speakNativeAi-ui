@@ -88,6 +88,14 @@
             "arm64"
           ]
         }
+      ],
+      "protocols": [
+        {
+          "name": "SpeakNative AI",
+          "schemes": [
+            "speaknativeai"
+          ]
+        }
       ]
     },
     "win": {
@@ -98,6 +106,14 @@
             "x64"
           ]
         }
+      ],
+      "protocols": [
+        {
+          "name": "SpeakNative AI",
+          "schemes": [
+            "speaknativeai"
+          ]
+        }
       ]
     },
     "linux": {
@@ -106,6 +122,14 @@
           "target": "AppImage",
           "arch": [
             "x64"
+          ]
+        }
+      ],
+      "protocols": [
+        {
+          "name": "SpeakNative AI",
+          "schemes": [
+            "speaknativeai"
           ]
         }
       ]
