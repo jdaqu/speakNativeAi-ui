@@ -15,7 +15,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   isElectron: true,
 
   // API base URL for Electron
-  getApiBaseUrl: () => 'http://localhost:8000/api',
+  getApiBaseUrl: () => 'https://speaknativeai-api-production.up.railway.app/api',
 
   // Shared token storage (accessible across all windows)
   getSharedToken: () => ipcRenderer.invoke('get-shared-token'),

@@ -112,22 +112,12 @@ export default function HomePage() {
 
   const handleGoogleLogin = () => {
     const apiBaseUrl = getApiBaseUrl()
-    
-    console.log('Google login clicked')
-    console.log('isElectron:', isElectron)
-    console.log('window.electronAPI available:', !!window.electronAPI)
-    console.log('window.electronAPI.openGoogleLogin available:', !!(window.electronAPI as any)?.openGoogleLogin)
-    console.log('apiBaseUrl:', apiBaseUrl)
-    
+        
     if (isElectron && window.electronAPI?.openGoogleLogin) {
       // Use Electron's OAuth flow
-      console.log('Using Electron OAuth flow')
-      const finalUrl = `${apiBaseUrl}/v1/auth/google/login?platform=electron`
-      console.log('Final OAuth URL will be:', finalUrl)
       ;(window as unknown as { electronAPI: { openGoogleLogin: (apiBaseUrl: string) => Promise<boolean> } }).electronAPI.openGoogleLogin(apiBaseUrl)
     } else {
       // Use web OAuth flow
-      console.log('Using web OAuth flow')
       window.location.href = `${apiBaseUrl}/v1/auth/google/login`
     }
   }
