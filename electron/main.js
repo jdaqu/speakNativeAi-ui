@@ -1,4 +1,4 @@
-const { app, BrowserWindow, globalShortcut, Tray, Menu, ipcMain, screen } = require('electron')
+const { app, BrowserWindow, globalShortcut, Tray, Menu, ipcMain, screen, shell, protocol } = require('electron')
 const path = require('path')
 const isTest = process.env.NODE_ENV === 'test'
 // Don't use app.isPackaged during module initialization - it's only available after app is ready
@@ -181,6 +181,76 @@ const showQuickAccess = () => {
   }
 }
 
+// Register custom protocol for OAuth callback
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient('speaknativeai', process.execPath, [path.resolve(process.argv[1])])
+  }
+} else {
+  app.setAsDefaultProtocolClient('speaknativeai')
+}
+
+// Handle OAuth callback from deep link
+const handleOAuthCallback = (url) => {
+  console.log('Received OAuth callback URL:', url)
+  
+  // Parse the URL to get the access token
+  const urlObj = new URL(url)
+  const params = new URLSearchParams(urlObj.search)
+  const accessToken = params.get('access_token')
+  const error = params.get('error')
+  
+  console.log('Parsed access token:', accessToken ? 'Present' : 'Missing')
+  console.log('Parsed error:', error)
+  
+  if (accessToken) {
+    // Send token to all windows
+    if (mainWindow) {
+      mainWindow.webContents.send('oauth-callback', { success: true, accessToken })
+      mainWindow.show()
+      mainWindow.focus()
+    }
+    if (quickAccessWindow) {
+      quickAccessWindow.webContents.send('oauth-callback', { success: true, accessToken })
+    }
+  } else {
+    // Handle error
+    const errorMessage = params.get('message') || 'OAuth authentication failed'
+    if (mainWindow) {
+      mainWindow.webContents.send('oauth-callback', { success: false, error: errorMessage })
+      mainWindow.show()
+      mainWindow.focus()
+    }
+  }
+}
+
+// Handle protocol for macOS
+app.on('open-url', (event, url) => {
+  event.preventDefault()
+  handleOAuthCallback(url)
+})
+
+// Handle protocol for Windows/Linux
+const gotTheLock = app.requestSingleInstanceLock()
+
+if (!gotTheLock) {
+  app.quit()
+} else {
+  app.on('second-instance', (event, commandLine) => {
+    // Someone tried to run a second instance, we should focus our window instead.
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.focus()
+    }
+    
+    // Handle deep link on Windows/Linux
+    const url = commandLine.find((arg) => arg.startsWith('speaknativeai://'))
+    if (url) {
+      handleOAuthCallback(url)
+    }
+  })
+}
+
 // App event handlers
 app.whenReady().then(() => {
   createMainWindow()
@@ -257,5 +327,14 @@ ipcMain.handle('set-shared-token', (event, token) => {
 
 ipcMain.handle('remove-shared-token', () => {
   sharedAuthToken = null
+  return true
+})
+
+// OAuth handlers
+ipcMain.handle('open-google-login', async (event, apiBaseUrl) => {
+  // Open Google OAuth login in default browser with platform=electron parameter
+  const loginUrl = `${apiBaseUrl}/v1/auth/google/login?platform=electron`
+  console.log('Opening Google OAuth URL:', loginUrl)
+  await shell.openExternal(loginUrl)
   return true
 }) 
