@@ -82,6 +82,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Update package.json version
+        run: |
+          VERSION_NUMBER="${{ needs.version.outputs.new_version_number }}"
+          echo "Updating package.json version to $VERSION_NUMBER"
+          npm version $VERSION_NUMBER --no-git-tag-version
+
       - name: Build for ${{ matrix.arch }}
         run: |
           if [ "${{ matrix.arch }}" = "arm64" ]; then
