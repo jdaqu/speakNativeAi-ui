@@ -99,7 +99,7 @@
       ]
     },
     "dmg": {
-      "filesystem": "HFS+",
+      "format": "UDBZ",
       "writeUpdateInfo": false
     },
     "win": {
