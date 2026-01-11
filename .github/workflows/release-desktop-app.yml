@@ -9,6 +9,9 @@ concurrency:
   group: "release"
   cancel-in-progress: false  # Queue sequential runs, don't cancel
 
+permissions:
+  contents: write  # Required to create tags and releases
+
 jobs:
   # Job 1: Auto-increment version based on latest git tag
   version:
