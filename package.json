@@ -89,10 +89,6 @@
           ]
         }
       ],
-      "dmg": {
-        "filesystem": "HFS+",
-        "writeUpdateInfo": false
-      },
       "protocols": [
         {
           "name": "SpeakNative AI",
@@ -101,6 +97,10 @@
           ]
         }
       ]
+    },
+    "dmg": {
+      "filesystem": "HFS+",
+      "writeUpdateInfo": false
     },
     "win": {
       "target": [
