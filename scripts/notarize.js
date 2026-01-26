@@ -1,6 +1,11 @@
-const { notarize } = require('@electron/notarize');
 const path = require('path');
 const fs = require('fs');
+
+// Dynamic import for ES Module compatibility
+async function getNotarize() {
+  const { notarize } = await import('@electron/notarize');
+  return notarize;
+}
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 30000; // 30 seconds
@@ -73,6 +78,7 @@ function categorizeError(error) {
 async function notarizeWithRetry(options, context, attempt = 1) {
   try {
     console.log(`\nNotarization attempt ${attempt} of ${MAX_RETRIES}...`);
+    const notarize = await getNotarize();
     await notarize(options);
     return true;
   } catch (error) {
