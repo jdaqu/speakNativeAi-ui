@@ -50,6 +50,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@electron/notarize": "^3.1.1",
     "@eslint/eslintrc": "^3",
     "@playwright/test": "^1.56.0",
     "@types/node": "^20",
@@ -79,7 +80,10 @@
     ],
     "mac": {
       "category": "public.app-category.education",
-      "identity": null,
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
       "target": [
         {
           "target": "dmg",
@@ -98,6 +102,7 @@
         }
       ]
     },
+    "afterSign": "scripts/notarize.js",
     "dmg": {
       "format": "UDBZ",
       "writeUpdateInfo": false
