@@ -177,6 +177,7 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
 
       - name: Rename and prepare DMG for release
+        id: prepare
         run: |
           cd dist
           VERSION="${{ needs.version.outputs.new_version_number }}"
@@ -200,11 +201,19 @@ jobs:
           FINAL_NAME="SpeakNativeAI-${VERSION}-mac-${ARCH_NAME}.dmg"
           mv "$DMG_FILE" "$FINAL_NAME"
 
+          # Remove any other DMG files that might exist
+          for file in *.dmg; do
+            if [ "$file" != "$FINAL_NAME" ]; then
+              echo "Removing extra DMG file: $file"
+              rm -f "$file"
+            fi
+          done
+
           # Generate SHA256 checksum
           shasum -a 256 "$FINAL_NAME" > "${FINAL_NAME}.sha256"
 
           echo "Prepared files:"
-          ls -lh "$FINAL_NAME" "${FINAL_NAME}.sha256"
+          ls -lh
           echo "Checksum:"
           cat "${FINAL_NAME}.sha256"
 
@@ -212,13 +221,17 @@ jobs:
           echo "Verifying DMG integrity..."
           hdiutil verify "$FINAL_NAME"
 
+          # Output file paths for upload step
+          echo "dmg_file=${FINAL_NAME}" >> $GITHUB_OUTPUT
+          echo "sha_file=${FINAL_NAME}.sha256" >> $GITHUB_OUTPUT
+
       - name: Upload DMG directly to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.version.outputs.new_version }}
           files: |
-            dist/*.dmg
-            dist/*.sha256
+            dist/${{ steps.prepare.outputs.dmg_file }}
+            dist/${{ steps.prepare.outputs.sha_file }}
           draft: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
