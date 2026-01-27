@@ -13,7 +13,7 @@ permissions:
   contents: write  # Required to create tags and releases
 
 jobs:
-  # Job 1: Auto-increment version based on latest git tag
+  # Job 1: Auto-increment version and create tag
   version:
     runs-on: ubuntu-latest
     outputs:
@@ -60,7 +60,80 @@ jobs:
           echo "Previous version: ${PREV_VERSION}"
           echo "New version: ${NEW_VERSION}"
 
-  # Job 2: Build DMGs in parallel for ARM64 and Intel
+      - name: Create git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag ${{ steps.bump.outputs.new_version }}
+          git push origin ${{ steps.bump.outputs.new_version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate release notes
+        id: notes
+        run: |
+          VERSION="${{ steps.bump.outputs.new_version }}"
+          VERSION_NUM="${{ steps.bump.outputs.new_version_number }}"
+          PREV="${{ steps.bump.outputs.previous_version }}"
+
+          # Get commit messages since last tag
+          if [ "$PREV" = "none" ]; then
+            COMMITS=$(git log --pretty=format:"- %s (%h)" -10)
+          else
+            COMMITS=$(git log ${PREV}..HEAD --pretty=format:"- %s (%h)")
+          fi
+
+          # Create release notes
+          cat > notes.md << 'EOF'
+          ## Desktop App Release
+
+          ### What's New
+          EOF
+
+          if [ -n "$COMMITS" ]; then
+            echo "$COMMITS" >> notes.md
+          else
+            echo "- Automated release from main branch" >> notes.md
+          fi
+
+          cat >> notes.md << EOF
+
+          ### Downloads
+
+          | Platform | Architecture | Download |
+          |----------|--------------|----------|
+          | macOS | Apple Silicon (M1/M2/M3) | [SpeakNativeAI-mac-arm64.dmg](https://github.com/jdaqu/speakNativeAi-ui/releases/download/${VERSION}/SpeakNativeAI-${VERSION_NUM}-mac-arm64.dmg) |
+          | macOS | Intel | [SpeakNativeAI-mac-intel.dmg](https://github.com/jdaqu/speakNativeAi-ui/releases/download/${VERSION}/SpeakNativeAI-${VERSION_NUM}-mac-intel.dmg) |
+
+          ### Installation
+          1. Download the appropriate version for your Mac
+          2. Open the .dmg file
+          3. Drag SpeakNative AI to your Applications folder
+          4. Launch the app and sign in with your account
+
+          ### Features
+          - Global hotkey access (Cmd+Shift+S)
+          - Quick Fix, Translate & Define popup
+          - System tray integration
+          - Native OS integration
+          - Works with authenticated API access
+          EOF
+
+          echo "Release notes generated"
+          cat notes.md
+
+      - name: Create draft GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.bump.outputs.new_version }}
+          name: Release ${{ steps.bump.outputs.new_version }}
+          body_path: notes.md
+          draft: true
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Job 2: Build DMGs and upload directly to release (no artifact transfer)
   build:
     needs: version
     strategy:
@@ -103,210 +176,77 @@ jobs:
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
 
-      - name: Generate SHA256 checksum
+      - name: Rename and prepare DMG for release
         run: |
           cd dist
-          for file in *.dmg; do
-            if [ -f "$file" ]; then
-              shasum -a 256 "$file" > "$file.sha256"
-              echo "Generated checksum for $file:"
-              cat "$file.sha256"
-            fi
-          done
-
-      - name: Upload ${{ matrix.arch }} artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dmg-${{ matrix.arch }}-${{ github.sha }}
-          path: |
-            dist/*.dmg
-            dist/*.sha256
-          retention-days: 7
-
-  # Job 3: Assemble release and publish
-  release:
-    needs: [version, build]
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Needed for commit history in release notes
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts/
-          pattern: dmg-*
-          merge-multiple: true
-
-      - name: List downloaded artifacts
-        run: |
-          echo "Downloaded artifacts:"
-          ls -lh artifacts/
-
-      - name: Rename DMG files for consistency
-        run: |
-          cd artifacts
           VERSION="${{ needs.version.outputs.new_version_number }}"
+          ARCH="${{ matrix.arch }}"
 
-          # Find and rename ARM64 file
-          ARM64_FILE=$(ls *-arm64.dmg 2>/dev/null || ls *arm64*.dmg 2>/dev/null | head -1)
-          if [ -n "$ARM64_FILE" ]; then
-            echo "Found ARM64 file: $ARM64_FILE"
-            mv "$ARM64_FILE" "SpeakNativeAI-${VERSION}-mac-arm64.dmg"
-            # Rename checksum file
-            ARM64_CHECKSUM=$(ls "${ARM64_FILE}.sha256" 2>/dev/null)
-            if [ -n "$ARM64_CHECKSUM" ]; then
-              mv "$ARM64_CHECKSUM" "SpeakNativeAI-${VERSION}-mac-arm64.dmg.sha256"
-            fi
+          # Map x64 to intel for filename
+          if [ "$ARCH" = "x64" ]; then
+            ARCH_NAME="intel"
           else
-            echo "Error: ARM64 DMG file not found"
+            ARCH_NAME="arm64"
+          fi
+
+          # Find the DMG file
+          DMG_FILE=$(ls *.dmg | head -1)
+          if [ -z "$DMG_FILE" ]; then
+            echo "Error: No DMG file found"
             exit 1
           fi
 
-          # Find and rename Intel file (doesn't have -arm64 in name)
-          INTEL_FILE=$(ls *.dmg 2>/dev/null | grep -v "arm64" | grep -v "SpeakNativeAI" | head -1)
-          if [ -n "$INTEL_FILE" ]; then
-            echo "Found Intel file: $INTEL_FILE"
-            mv "$INTEL_FILE" "SpeakNativeAI-${VERSION}-mac-intel.dmg"
-            # Rename checksum file
-            INTEL_CHECKSUM=$(ls "${INTEL_FILE}.sha256" 2>/dev/null)
-            if [ -n "$INTEL_CHECKSUM" ]; then
-              mv "$INTEL_CHECKSUM" "SpeakNativeAI-${VERSION}-mac-intel.dmg.sha256"
-            fi
-          else
-            echo "Error: Intel DMG file not found"
-            exit 1
-          fi
+          # Rename to consistent format
+          FINAL_NAME="SpeakNativeAI-${VERSION}-mac-${ARCH_NAME}.dmg"
+          mv "$DMG_FILE" "$FINAL_NAME"
 
-          echo "Renamed files:"
-          ls -lh
+          # Generate SHA256 checksum
+          shasum -a 256 "$FINAL_NAME" > "${FINAL_NAME}.sha256"
 
-      - name: Regenerate checksums after rename
-        run: |
-          cd artifacts
-          for file in *.dmg; do
-            if [ -f "$file" ]; then
-              shasum -a 256 "$file" > "$file.sha256"
-              echo "Generated checksum for $file:"
-              cat "$file.sha256"
-            fi
-          done
+          echo "Prepared files:"
+          ls -lh "$FINAL_NAME" "${FINAL_NAME}.sha256"
+          echo "Checksum:"
+          cat "${FINAL_NAME}.sha256"
 
-      - name: Verify DMG integrity
-        run: |
-          cd artifacts
-          echo "Verifying DMG files..."
-          for file in *.dmg; do
-            if [ -f "$file" ]; then
-              echo "Checking $file..."
-              # Check file size
-              ls -lh "$file"
-              # Verify it's a valid DMG (basic check)
-              file "$file"
-            fi
-          done
+          # Verify DMG integrity before upload
+          echo "Verifying DMG integrity..."
+          hdiutil verify "$FINAL_NAME"
 
-      - name: Create git tag
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag ${{ needs.version.outputs.new_version }}
-          git push origin ${{ needs.version.outputs.new_version }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Generate release notes
-        id: notes
-        run: |
-          VERSION="${{ needs.version.outputs.new_version }}"
-          VERSION_NUM="${{ needs.version.outputs.new_version_number }}"
-          PREV="${{ needs.version.outputs.previous_version }}"
-
-          # Get commit messages since last tag
-          if [ "$PREV" = "none" ]; then
-            COMMITS=$(git log --pretty=format:"- %s (%h)" -10)
-          else
-            COMMITS=$(git log ${PREV}..HEAD --pretty=format:"- %s (%h)")
-          fi
-
-          # Read checksums
-          ARM64_CHECKSUM=$(cat artifacts/SpeakNativeAI-${VERSION_NUM}-mac-arm64.dmg.sha256 2>/dev/null || echo "Checksum not available")
-          INTEL_CHECKSUM=$(cat artifacts/SpeakNativeAI-${VERSION_NUM}-mac-intel.dmg.sha256 2>/dev/null || echo "Checksum not available")
-
-          # Create release notes
-          cat > notes.md << 'EOF'
-          ## Desktop App Release ${{ needs.version.outputs.new_version }}
-
-          ### What's New
-          EOF
-
-          if [ -n "$COMMITS" ]; then
-            echo "$COMMITS" >> notes.md
-          else
-            echo "- Automated release from main branch" >> notes.md
-          fi
-
-          cat >> notes.md << 'EOF'
-
-          ### Downloads
-
-          | Platform | Architecture | Download |
-          |----------|--------------|----------|
-          | macOS | Apple Silicon (M1/M2/M3) | [SpeakNativeAI-mac-arm64.dmg](https://github.com/jdaqu/speakNativeAi-ui/releases/download/${{ needs.version.outputs.new_version }}/SpeakNativeAI-${{ needs.version.outputs.new_version_number }}-mac-arm64.dmg) |
-          | macOS | Intel | [SpeakNativeAI-mac-intel.dmg](https://github.com/jdaqu/speakNativeAi-ui/releases/download/${{ needs.version.outputs.new_version }}/SpeakNativeAI-${{ needs.version.outputs.new_version_number }}-mac-intel.dmg) |
-
-          ### Checksums (SHA256)
-
-          **Apple Silicon:**
-          ```
-          EOF
-          echo "$ARM64_CHECKSUM" >> notes.md
-          echo '```' >> notes.md
-          echo "" >> notes.md
-          echo "**Intel:**" >> notes.md
-          echo '```' >> notes.md
-          echo "$INTEL_CHECKSUM" >> notes.md
-          echo '```' >> notes.md
-
-          cat >> notes.md << 'EOF'
-
-          ### Installation
-          1. Download the appropriate version for your Mac
-          2. Open the .dmg file
-          3. Drag SpeakNative AI to your Applications folder
-          4. Launch the app and sign in with your account
-
-          ### Features
-          - Global hotkey access (Cmd+Shift+S)
-          - Quick Fix, Translate & Define popup
-          - System tray integration
-          - Native OS integration
-          - Works with authenticated API access
-
-          ### Verification
-          To verify your download, run:
-          ```bash
-          shasum -a 256 SpeakNativeAI-${{ needs.version.outputs.new_version_number }}-mac-arm64.dmg
-          ```
-          Compare the output with the checksum above.
-          EOF
-
-          echo "Release notes generated"
-          cat notes.md
-
-      - name: Create GitHub Release
+      - name: Upload DMG directly to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.version.outputs.new_version }}
-          name: Release ${{ needs.version.outputs.new_version }}
-          body_path: notes.md
           files: |
-            artifacts/*.dmg
-            artifacts/*.sha256
-          draft: false
-          prerelease: false
+            dist/*.dmg
+            dist/*.sha256
+          draft: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Job 3: Publish the release after both builds complete
+  publish:
+    needs: [version, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish GitHub Release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: releases } = await github.rest.repos.listReleases({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            const draftRelease = releases.find(r => r.tag_name === '${{ needs.version.outputs.new_version }}' && r.draft);
+
+            if (draftRelease) {
+              await github.rest.repos.updateRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: draftRelease.id,
+                draft: false
+              });
+              console.log(`Published release ${draftRelease.tag_name}`);
+            } else {
+              console.log('No draft release found to publish');
+            }
