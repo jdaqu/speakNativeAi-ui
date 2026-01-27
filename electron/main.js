@@ -41,11 +41,16 @@ const createMainWindow = () => {
       mainWindow.webContents.openDevTools()
     }
   } else {
-    console.log('Loading from file:', path.join(__dirname, '../out/index.html'))
-    // Use loadURL with file protocol for better path resolution
     const filePath = path.join(__dirname, '../out/index.html')
-    mainWindow.loadURL(`file://${filePath}`)
+    console.log('Loading from file:', filePath)
+    // Use loadFile for proper ASAR support
+    mainWindow.loadFile(filePath)
   }
+
+  // Handle loading errors
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+    console.error('Failed to load:', errorCode, errorDescription)
+  })
 
   mainWindow.on('closed', () => {
     mainWindow = null
@@ -102,7 +107,8 @@ const createQuickAccessWindow = () => {
     quickAccessWindow.loadURL(devServerUrl)
   } else {
     const quickAccessPath = path.join(__dirname, '../out/quick-access/index.html')
-    quickAccessWindow.loadURL(`file://${quickAccessPath}`)
+    // Use loadFile for proper ASAR support
+    quickAccessWindow.loadFile(quickAccessPath)
   }
 
   quickAccessWindow.on('closed', () => {
