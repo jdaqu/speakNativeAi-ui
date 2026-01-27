@@ -184,6 +184,31 @@ jobs:
           echo "Renamed files:"
           ls -lh
 
+      - name: Regenerate checksums after rename
+        run: |
+          cd artifacts
+          for file in *.dmg; do
+            if [ -f "$file" ]; then
+              shasum -a 256 "$file" > "$file.sha256"
+              echo "Generated checksum for $file:"
+              cat "$file.sha256"
+            fi
+          done
+
+      - name: Verify DMG integrity
+        run: |
+          cd artifacts
+          echo "Verifying DMG files..."
+          for file in *.dmg; do
+            if [ -f "$file" ]; then
+              echo "Checking $file..."
+              # Check file size
+              ls -lh "$file"
+              # Verify it's a valid DMG (basic check)
+              file "$file"
+            fi
+          done
+
       - name: Create git tag
         run: |
           git config user.name "github-actions[bot]"
